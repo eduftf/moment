@@ -15,3 +15,101 @@ body {
   padding: 16px;
   max-width: 400px;
 }
+
+h1 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.status-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot.green { background: #22c55e; }
+.dot.yellow { background: #eab308; }
+.dot.gray { background: #9ca3af; }
+
+.muted {
+  color: #888;
+  font-size: 12px;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.moments-list {
+  list-style: none;
+}
+
+.moment-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.capture-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.capture-icon.auto { background: #dcfce7; color: #16a34a; }
+.capture-icon.manual { background: #fef3c7; color: #d97706; }
+
+.capture-btn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.capture-btn:hover { background: #1d4ed8; }
+.capture-btn:active { background: #1e40af; }

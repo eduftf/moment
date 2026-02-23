@@ -1242,10 +1242,10 @@ Create `docs/zoom-marketplace-setup.md` with these steps:
 2. App Name: "Moment"
 3. Basic Information: fill in company, description
 4. OAuth:
-   - Redirect URL: `https://moment.pages.dev/` (your CF Pages URL)
-   - Add to Domain Allow List: `moment.pages.dev`, `localhost`
+   - Redirect URL: `https://moment.gtools.space/` (your CF Pages URL)
+   - Add to Domain Allow List: `moment.gtools.space`, `localhost`
 5. Surface tab > Zoom Meetings:
-   - Home URL: `https://moment.pages.dev/` (production) or ngrok URL (development)
+   - Home URL: `https://moment.gtools.space/` (production) or ngrok URL (development)
    - Add SDK capabilities: `onReaction`, `onEmojiReaction`, `onParticipantChange`, `getMeetingParticipants`, `getMeetingContext`, `getUserContext`
 6. Scopes: `zoomapp:inmeeting` (default)
 7. Local Test: Add to your Zoom account

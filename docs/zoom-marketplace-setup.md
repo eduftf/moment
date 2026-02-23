@@ -20,17 +20,17 @@
 
 ## 3. OAuth Configuration
 
-- **Redirect URL**: `https://moment.pages.dev/` (your Cloudflare Pages URL)
-- **OAuth Allow List**: `moment.pages.dev`, `localhost`
+- **Redirect URL**: `https://moment.gtools.space/` (your Cloudflare Pages URL)
+- **OAuth Allow List**: `moment.gtools.space`, `localhost`
 
 Save the **Client ID** and **Client Secret** (you'll need them if you add REST API features later).
 
 ## 4. Surface: Zoom Meetings
 
 1. Select **Zoom Meetings** as a product
-2. **Home URL**: `https://moment.pages.dev/` (production) or your ngrok URL (development)
+2. **Home URL**: `https://moment.gtools.space/` (production) or your ngrok URL (development)
 3. **Domain Allow List**: add all domains your app loads from:
-   - `moment.pages.dev`
+   - `moment.gtools.space`
    - `localhost` (for development)
 4. Enable **In-client features** and add SDK capabilities:
    - `onReaction`

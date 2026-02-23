@@ -1,0 +1,5 @@
+{
+  "name": "moment",
+  "private": true,
+  "workspaces": ["app", "companion"]
+}

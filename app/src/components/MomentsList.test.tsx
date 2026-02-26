@@ -63,4 +63,15 @@ describe("MomentsList", () => {
 
     expect(screen.getByText("Missed")).toBeInTheDocument();
   });
+
+  it("shows 'Reaction' label and custom emoji when emoji is set", () => {
+    render(
+      <MomentsList
+        moments={[makeMoment({ trigger: "reaction", emoji: "\u2764" })]}
+      />
+    );
+
+    expect(screen.getByText("Reaction")).toBeInTheDocument();
+    expect(screen.getByText("\u2764")).toBeInTheDocument();
+  });
 });

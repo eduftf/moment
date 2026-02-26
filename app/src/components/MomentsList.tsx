@@ -8,14 +8,14 @@ function formatTime(date: Date): string {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-const triggerEmoji: Record<Moment["trigger"], string> = {
+const defaultEmoji: Record<Moment["trigger"], string> = {
   reaction: "\u{1F44D}",
   peak: "\u{1F4C8}",
   manual: "\u{1F4F7}",
 };
 
 function triggerLabel(m: Moment): string {
-  if (m.trigger === "reaction") return "Thumbs up";
+  if (m.trigger === "reaction") return m.emoji ? "Reaction" : "Thumbs up";
   if (m.trigger === "peak") return `Peak: ${m.participantCount}`;
   return "Manual";
 }
@@ -42,7 +42,7 @@ export function MomentsList({ moments }: Props) {
         {moments.map((m) => (
           <li key={m.id} className={`moment-item ${m.trigger}`}>
             <span className={`moment-trigger-icon ${m.trigger}`}>
-              {triggerEmoji[m.trigger]}
+              {m.emoji || defaultEmoji[m.trigger]}
             </span>
             <div className="moment-details">
               <div className="moment-time">{formatTime(m.timestamp)}</div>

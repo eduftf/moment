@@ -1,29 +1,39 @@
 import { useEffect, useRef, useCallback } from "react";
 import zoomSdk from "@zoom/appssdk";
 
-const THUMBS_UP_UNICODE = "U+1F44D";
 const DEBOUNCE_MS = 5000;
 
 interface UseReactionTriggerOptions {
   enabled: boolean;
-  onTrigger: () => void;
+  onTrigger: (emoji: string, unicode: string) => void;
+  /** If set and non-empty, only these unicode values trigger. If undefined or empty, ALL reactions trigger. */
+  allowedReactions?: string[];
 }
 
-export function useReactionTrigger({ enabled, onTrigger }: UseReactionTriggerOptions) {
+export function useReactionTrigger({ enabled, onTrigger, allowedReactions }: UseReactionTriggerOptions) {
   const lastTriggerRef = useRef<number>(0);
   const onTriggerRef = useRef(onTrigger);
   onTriggerRef.current = onTrigger;
 
-  const handler = useCallback((event: { unicode?: string; reaction?: { unicode?: string } }) => {
+  const allowedRef = useRef(allowedReactions);
+  allowedRef.current = allowedReactions;
+
+  const handler = useCallback((event: { emoji?: string; unicode?: string; reaction?: { emoji?: string; unicode?: string } }) => {
     // Support both onReaction (event.unicode) and onEmojiReaction (event.reaction.unicode)
     const unicode = event.unicode ?? event.reaction?.unicode;
-    if (unicode !== THUMBS_UP_UNICODE) return;
+    if (!unicode) return;
+
+    const emoji = event.emoji ?? event.reaction?.emoji ?? unicode;
+
+    // Filter by allowedReactions if configured
+    const allowed = allowedRef.current;
+    if (allowed && allowed.length > 0 && !allowed.includes(unicode)) return;
 
     const now = Date.now();
     if (now - lastTriggerRef.current < DEBOUNCE_MS) return;
 
     lastTriggerRef.current = now;
-    onTriggerRef.current();
+    onTriggerRef.current(emoji, unicode);
   }, []);
 
   useEffect(() => {

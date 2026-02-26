@@ -15,8 +15,11 @@ const CAPABILITIES = [
   "onReaction",
   "onEmojiReaction",
   "onParticipantChange",
+  "onActiveSpeakerChange",
+  "onFeedbackReaction",
   "getMeetingParticipants",
   "getMeetingContext",
+  "getMeetingUUID",
   "getUserContext",
 ] as const;
 

@@ -16,6 +16,13 @@ export const zoomSdkMock = {
   getMeetingParticipants: vi.fn().mockResolvedValue({
     participants: [],
   }),
+  getMeetingContext: vi.fn().mockResolvedValue({
+    meetingTopic: "Test Meeting",
+    meetingID: "123456789",
+  }),
+  getMeetingUUID: vi.fn().mockResolvedValue({
+    meetingUUID: "test-uuid-abc123",
+  }),
   addEventListener: vi.fn((event: string, handler: Listener) => {
     if (!listeners.has(event)) listeners.set(event, new Set());
     listeners.get(event)!.add(handler);
@@ -44,6 +51,13 @@ export function resetZoomMock() {
   });
   zoomSdkMock.getMeetingParticipants.mockResolvedValue({
     participants: [],
+  });
+  zoomSdkMock.getMeetingContext.mockResolvedValue({
+    meetingTopic: "Test Meeting",
+    meetingID: "123456789",
+  });
+  zoomSdkMock.getMeetingUUID.mockResolvedValue({
+    meetingUUID: "test-uuid-abc123",
   });
 }
 

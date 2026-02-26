@@ -8,15 +8,31 @@ interface Props {
 export function TriggerSettings({ reactionEnabled, peakEnabled, onToggleReaction, onTogglePeak }: Props) {
   return (
     <div className="section">
-      <h3>Triggers</h3>
-      <label className="toggle-row">
-        <input type="checkbox" checked={reactionEnabled} onChange={onToggleReaction} />
-        <span>Thumbs up reaction</span>
-      </label>
-      <label className="toggle-row">
-        <input type="checkbox" checked={peakEnabled} onChange={onTogglePeak} />
-        <span>Peak participant count</span>
-      </label>
+      <div className="card">
+        <div className="section-label">Triggers</div>
+        <div className="trigger-row">
+          <div className="trigger-info">
+            <div className="trigger-icon reaction">&#128077;</div>
+            <span className="trigger-name">Reaction capture</span>
+          </div>
+          <label className="toggle">
+            <input type="checkbox" checked={reactionEnabled} onChange={onToggleReaction} />
+            <span className="toggle-track" />
+            <span className="toggle-thumb" />
+          </label>
+        </div>
+        <div className="trigger-row">
+          <div className="trigger-info">
+            <div className="trigger-icon peak">&#128200;</div>
+            <span className="trigger-name">Peak participants</span>
+          </div>
+          <label className="toggle">
+            <input type="checkbox" checked={peakEnabled} onChange={onTogglePeak} />
+            <span className="toggle-track" />
+            <span className="toggle-thumb" />
+          </label>
+        </div>
+      </div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ describe("CaptureButton", () => {
   it("renders with correct text", () => {
     render(<CaptureButton onClick={() => {}} />);
 
-    expect(screen.getByRole("button", { name: "Capture Now" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /capture now/i })).toBeInTheDocument();
   });
 
   it("calls onClick when clicked", async () => {

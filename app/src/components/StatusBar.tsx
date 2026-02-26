@@ -8,20 +8,21 @@ interface Props {
 
 export function StatusBar({ sdkReady, companionConnected, participants }: Props) {
   return (
-    <div className="status-bar">
-      <div className="status-row">
-        <span className={`dot ${sdkReady ? "green" : "yellow"}`} />
-        <span>{sdkReady ? "Listening" : "Connecting..."}</span>
-      </div>
-      <div className="status-row">
-        <span>Participants: {participants.current}</span>
-        <span className="muted"> (peak: {participants.peak})</span>
-      </div>
-      <div className="status-row">
-        <span className={`dot ${companionConnected ? "green" : "gray"}`} />
-        <span>
-          Companion: {companionConnected ? "Connected" : "Not running"}
-        </span>
+    <div className="card">
+      <div className="status-bar">
+        <div className="status-row">
+          <span className={`dot ${sdkReady ? "green" : "yellow"}`} />
+          <span className="label">{sdkReady ? "Listening" : "Connecting..."}</span>
+          <span className="participants-badge">
+            {participants.current} <span className="peak">&#x2191;{participants.peak}</span>
+          </span>
+        </div>
+        <div className="status-row">
+          <span className={`dot ${companionConnected ? "green" : "gray"}`} />
+          <span className="label">
+            Companion {companionConnected ? "connected" : "not running"}
+          </span>
+        </div>
       </div>
     </div>
   );

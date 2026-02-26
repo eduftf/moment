@@ -27,7 +27,7 @@ describe("StatusBar", () => {
     expect(screen.getByText("Connecting...")).toBeInTheDocument();
   });
 
-  it("shows participant count and peak", () => {
+  it("shows participant count", () => {
     render(
       <StatusBar
         sdkReady={true}
@@ -36,11 +36,11 @@ describe("StatusBar", () => {
       />
     );
 
-    expect(screen.getByText("Participants: 5")).toBeInTheDocument();
-    expect(screen.getByText("(peak: 12)")).toBeInTheDocument();
+    expect(screen.getByText(/5/)).toBeInTheDocument();
+    expect(screen.getByText(/12/)).toBeInTheDocument();
   });
 
-  it("shows Connected when companion is connected", () => {
+  it("shows connected when companion is connected", () => {
     render(
       <StatusBar
         sdkReady={true}
@@ -49,10 +49,10 @@ describe("StatusBar", () => {
       />
     );
 
-    expect(screen.getByText("Companion: Connected")).toBeInTheDocument();
+    expect(screen.getByText(/connected/i)).toBeInTheDocument();
   });
 
-  it("shows Not running when companion is disconnected", () => {
+  it("shows not running when companion is disconnected", () => {
     render(
       <StatusBar
         sdkReady={true}
@@ -61,6 +61,6 @@ describe("StatusBar", () => {
       />
     );
 
-    expect(screen.getByText("Companion: Not running")).toBeInTheDocument();
+    expect(screen.getByText(/not running/i)).toBeInTheDocument();
   });
 });

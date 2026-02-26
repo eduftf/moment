@@ -79,12 +79,20 @@ export default function App() {
   }, [addMoment]);
 
   if (sdk.status === "loading") {
-    return <div className="app"><p>Connecting to Zoom...</p></div>;
+    return (
+      <div className="app">
+        <div className="app-loading">
+          <div className="spinner" />
+          <span>Connecting to Zoom...</span>
+        </div>
+      </div>
+    );
   }
 
   if (sdk.status === "error") {
     return (
-      <div className="app">
+      <div className="app app-error">
+        <div className="error-icon">&#9888;</div>
         <h1>Moment</h1>
         <p className="error">Not connected to Zoom</p>
         <p className="muted">{sdk.error}</p>
@@ -94,7 +102,10 @@ export default function App() {
 
   return (
     <div className="app">
-      <h1>Moment</h1>
+      <div className="app-header">
+        <div className="app-logo">M</div>
+        <h1 className="app-title">Moment</h1>
+      </div>
       <StatusBar
         sdkReady={sdk.status === "ready"}
         companionConnected={companion.connected}
@@ -106,8 +117,8 @@ export default function App() {
         onToggleReaction={() => setReactionEnabled((v) => !v)}
         onTogglePeak={() => setPeakEnabled((v) => !v)}
       />
+      <CaptureButton onClick={handleManualCapture} ready={companion.connected} />
       <MomentsList moments={moments} />
-      <CaptureButton onClick={handleManualCapture} />
       {companion.config && (
         <Settings config={companion.config} onUpdate={companion.updateConfig} />
       )}

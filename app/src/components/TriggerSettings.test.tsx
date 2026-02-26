@@ -14,8 +14,8 @@ describe("TriggerSettings", () => {
       />
     );
 
-    expect(screen.getByText("Thumbs up reaction")).toBeInTheDocument();
-    expect(screen.getByText("Peak participant count")).toBeInTheDocument();
+    expect(screen.getByText("Reaction capture")).toBeInTheDocument();
+    expect(screen.getByText("Peak participants")).toBeInTheDocument();
   });
 
   it("reflects enabled state in checkboxes", () => {

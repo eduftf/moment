@@ -251,4 +251,132 @@ describe("useCompanion", () => {
 
     expect(ws.close).toHaveBeenCalled();
   });
+
+  it("sets archivePath on archive-started message", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    expect(result.current.archivePath).toBeNull();
+
+    const ws = MockWebSocket.instances[0];
+
+    act(() => {
+      ws.onmessage?.({
+        data: JSON.stringify({
+          type: "archive-started",
+          path: "/Users/test/Moment/Test Meeting/archive.jsonl",
+        }),
+      });
+    });
+
+    expect(result.current.archivePath).toBe(
+      "/Users/test/Moment/Test Meeting/archive.jsonl"
+    );
+  });
+
+  it("resets archivePath on disconnect", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    // Set archivePath via message
+    act(() => {
+      ws.onmessage?.({
+        data: JSON.stringify({
+          type: "archive-started",
+          path: "/Users/test/Moment/archive.jsonl",
+        }),
+      });
+    });
+
+    expect(result.current.archivePath).not.toBeNull();
+
+    // Simulate disconnect
+    act(() => {
+      ws.readyState = MockWebSocket.CLOSED;
+      ws.onclose?.();
+    });
+
+    expect(result.current.archivePath).toBeNull();
+  });
+
+  it("sends start-archive command", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+    const cmd = {
+      type: "start-archive" as const,
+      meetingTopic: "Standup",
+      meetingId: "123",
+      meetingUUID: "uuid-abc",
+      startTime: "2024-03-15T14:00:00.000Z",
+    };
+
+    let sent: boolean;
+    act(() => {
+      sent = result.current.startArchive(cmd);
+    });
+
+    expect(sent!).toBe(true);
+    expect(ws.send).toHaveBeenCalledWith(JSON.stringify(cmd));
+  });
+
+  it("sends archive-event command", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+    const cmd = {
+      type: "archive-event" as const,
+      event: {
+        type: "participant-join" as const,
+        timestamp: "2024-03-15T14:05:00.000Z",
+        name: "Alice",
+        uuid: "user-1",
+        role: "attendee",
+      },
+    };
+
+    let sent: boolean;
+    act(() => {
+      sent = result.current.archiveEvent(cmd);
+    });
+
+    expect(sent!).toBe(true);
+    expect(ws.send).toHaveBeenCalledWith(JSON.stringify(cmd));
+  });
+
+  it("sends end-archive command", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    let sent: boolean;
+    act(() => {
+      sent = result.current.endArchive();
+    });
+
+    expect(sent!).toBe(true);
+    expect(ws.send).toHaveBeenCalledWith(
+      JSON.stringify({ type: "end-archive" })
+    );
+  });
 });

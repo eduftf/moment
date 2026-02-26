@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { CaptureCommand } from "../types";
+import type {
+  CaptureCommand,
+  StartArchiveCommand,
+  ArchiveEventCommand,
+  EndArchiveCommand,
+} from "../types";
 
 export interface CompanionConfig {
   saveDir: string;
@@ -13,8 +18,17 @@ const RECONNECT_MS = 5000;
 export function useCompanion() {
   const [connected, setConnected] = useState(false);
   const [config, setConfig] = useState<CompanionConfig | null>(null);
+  const [archivePath, setArchivePath] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const send = useCallback((data: object): boolean => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      return false;
+    }
+    wsRef.current.send(JSON.stringify(data));
+    return true;
+  }, []);
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
@@ -29,6 +43,8 @@ export function useCompanion() {
           const msg = JSON.parse(event.data);
           if (msg.type === "config") {
             setConfig({ saveDir: msg.saveDir, captureMode: msg.captureMode });
+          } else if (msg.type === "archive-started") {
+            setArchivePath(msg.path);
           }
         } catch {}
       };
@@ -36,6 +52,7 @@ export function useCompanion() {
       ws.onclose = () => {
         setConnected(false);
         setConfig(null);
+        setArchivePath(null);
         wsRef.current = null;
         reconnectTimer.current = setTimeout(connect, RECONNECT_MS);
       };
@@ -58,18 +75,41 @@ export function useCompanion() {
     };
   }, [connect]);
 
-  const capture = useCallback((command: CaptureCommand): boolean => {
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      return false;
-    }
-    wsRef.current.send(JSON.stringify(command));
-    return true;
-  }, []);
+  const capture = useCallback(
+    (command: CaptureCommand): boolean => send(command),
+    [send]
+  );
 
-  const updateConfig = useCallback((updates: Partial<CompanionConfig>) => {
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-    wsRef.current.send(JSON.stringify({ type: "update-config", ...updates }));
-  }, []);
+  const updateConfig = useCallback(
+    (updates: Partial<CompanionConfig>) => {
+      send({ type: "update-config", ...updates });
+    },
+    [send]
+  );
 
-  return { connected, config, capture, updateConfig };
+  const startArchive = useCallback(
+    (cmd: StartArchiveCommand): boolean => send(cmd),
+    [send]
+  );
+
+  const archiveEvent = useCallback(
+    (cmd: ArchiveEventCommand): boolean => send(cmd),
+    [send]
+  );
+
+  const endArchive = useCallback(
+    (): boolean => send({ type: "end-archive" } satisfies EndArchiveCommand),
+    [send]
+  );
+
+  return {
+    connected,
+    config,
+    archivePath,
+    capture,
+    updateConfig,
+    startArchive,
+    archiveEvent,
+    endArchive,
+  };
 }

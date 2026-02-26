@@ -5,6 +5,7 @@ import { execFile } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { homedir, platform } from "node:os";
+import { sanitize, formatTimestamp } from "./utils.js";
 
 const PORT = 54321;
 const BASE_DIR = join(homedir(), "Moment");
@@ -16,16 +17,6 @@ interface CaptureCommand {
   participants: string[];
   participantCount: number;
   meetingTopic: string;
-}
-
-function sanitize(name: string): string {
-  return name.replace(/[^a-zA-Z0-9\s\-_]/g, "").trim().replace(/\s+/g, "-") || "meeting";
-}
-
-function formatTimestamp(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
 }
 
 async function takeScreenshot(filepath: string): Promise<void> {

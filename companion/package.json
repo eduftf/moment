@@ -7,13 +7,16 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/ws": "^8.5.13",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^4.0.18"
   }
 }

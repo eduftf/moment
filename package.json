@@ -1,5 +1,9 @@
 {
   "name": "moment",
   "private": true,
-  "workspaces": ["app", "companion"]
+  "workspaces": ["app", "companion"],
+  "scripts": {
+    "test": "npm run test:run --workspaces",
+    "test:watch": "npm run test --workspaces"
+  }
 }

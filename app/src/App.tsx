@@ -4,6 +4,7 @@ import { useZoomSdk } from "./hooks/useZoomSdk";
 import { useReactionTrigger } from "./hooks/useReactionTrigger";
 import { usePeakTrigger, type ParticipantState } from "./hooks/usePeakTrigger";
 import { useCompanion } from "./hooks/useCompanion";
+import { useArchive } from "./hooks/useArchive";
 import { StatusBar } from "./components/StatusBar";
 import { TriggerSettings } from "./components/TriggerSettings";
 import { MomentsList } from "./components/MomentsList";
@@ -14,6 +15,10 @@ import type { Moment, CaptureCommand } from "./types";
 export default function App() {
   const sdk = useZoomSdk();
   const companion = useCompanion();
+  useArchive({
+    sdkReady: sdk.status === "ready",
+    companion,
+  });
   const [moments, setMoments] = useState<Moment[]>([]);
   const [reactionEnabled, setReactionEnabled] = useState(true);
   const [peakEnabled, setPeakEnabled] = useState(true);
@@ -30,7 +35,7 @@ export default function App() {
   }, [sdk.status]);
 
   const addMoment = useCallback(
-    (trigger: Moment["trigger"]) => {
+    (trigger: Moment["trigger"], emoji?: string) => {
       const p = participantsRef.current;
       const now = new Date();
       const command: CaptureCommand = {
@@ -52,6 +57,7 @@ export default function App() {
         participants: p.names,
         meetingTopic: meetingTopicRef.current,
         captured,
+        emoji,
       };
 
       setMoments((prev) => [...prev, moment]);
@@ -71,7 +77,7 @@ export default function App() {
 
   useReactionTrigger({
     enabled: reactionEnabled && sdk.status === "ready",
-    onTrigger: () => addMoment("reaction"),
+    onTrigger: (emoji: string, _unicode: string) => addMoment("reaction", emoji),
   });
 
   const handleManualCapture = useCallback(() => {

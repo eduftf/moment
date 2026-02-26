@@ -16,6 +16,8 @@ jobs:
 
       - run: npm ci
 
+      - run: npm test
+
       - run: npm run build --workspace=app
 
       - name: Deploy to Cloudflare Pages

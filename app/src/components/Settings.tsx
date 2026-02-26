@@ -19,6 +19,7 @@ export function Settings({ config, onUpdate }: Props) {
           }
         >
           <option value="window">Zoom window</option>
+          <option value="video">Video only</option>
           <option value="screen">Full screen</option>
         </select>
       </label>

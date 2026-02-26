@@ -39,6 +39,13 @@ describe("Settings", () => {
     expect(onUpdate).toHaveBeenCalledWith({ captureMode: "screen" });
   });
 
+  it("shows video only option in capture mode select", () => {
+    render(<Settings config={{ ...defaultConfig, captureMode: "video" }} onUpdate={() => {}} />);
+
+    const select = screen.getByRole("combobox");
+    expect(select).toHaveValue("video");
+  });
+
   it("calls onUpdate with saveDir when input changes", () => {
     const onUpdate = vi.fn();
     render(<Settings config={defaultConfig} onUpdate={onUpdate} />);

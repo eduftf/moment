@@ -11,14 +11,23 @@ import { sanitize, formatTimestamp } from "./utils.js";
 const PORT = 54321;
 const CONFIG_PATH = join(homedir(), ".moment-config.json");
 
+interface VideoMargins {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
 interface Config {
   saveDir: string;
-  captureMode: "window" | "screen";
+  captureMode: "window" | "screen" | "video";
+  videoMargins: VideoMargins;
 }
 
 const DEFAULT_CONFIG: Config = {
   saveDir: join(homedir(), "Moment"),
   captureMode: "window",
+  videoMargins: { top: 50, bottom: 50, left: 10, right: 10 },
 };
 
 let config: Config = { ...DEFAULT_CONFIG };
@@ -46,11 +55,20 @@ interface CaptureCommand {
   meetingTopic: string;
 }
 
+interface WindowInfo {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 const FIND_ZOOM_WINDOW_SWIFT = `
 import CoreGraphics
 let windows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as! [[String: Any]]
 var bestId: Int? = nil
 var bestArea = 0
+var bestBounds: [String: Any]? = nil
 for w in windows {
     guard let owner = w["kCGWindowOwnerName"] as? String, owner == "zoom.us",
           let bounds = w["kCGWindowBounds"] as? [String: Any],
@@ -61,20 +79,28 @@ for w in windows {
     if (name.contains("Meeting") || name.contains("Webinar")) && area > bestArea {
         bestId = wid
         bestArea = area
+        bestBounds = bounds
     }
 }
-if let id = bestId { print(id) } else { print("") }
+if let id = bestId, let b = bestBounds,
+   let x = b["X"] as? Int, let y = b["Y"] as? Int,
+   let w = b["Width"] as? Int, let h = b["Height"] as? Int {
+    print("\\(id)|\\(x)|\\(y)|\\(w)|\\(h)")
+} else { print("") }
 `;
 
-/** Find the Zoom Meeting window ID on macOS using CoreGraphics via Swift */
-async function findZoomWindowId(): Promise<number | null> {
+/** Find the Zoom Meeting window on macOS using CoreGraphics via Swift */
+async function findZoomWindow(): Promise<WindowInfo | null> {
   if (platform() !== "darwin") return null;
 
   return new Promise((resolve) => {
     execFile("swift", ["-e", FIND_ZOOM_WINDOW_SWIFT], (error, stdout) => {
       if (error) { resolve(null); return; }
-      const id = parseInt(stdout.trim(), 10);
-      resolve(isNaN(id) ? null : id);
+      const parts = stdout.trim().split("|");
+      if (parts.length < 5) { resolve(null); return; }
+      const [id, x, y, width, height] = parts.map(Number);
+      if (isNaN(id)) { resolve(null); return; }
+      resolve({ id, x, y, width, height });
     });
   });
 }
@@ -85,10 +111,19 @@ async function takeScreenshot(filepath: string): Promise<void> {
   if (os === "darwin") {
     let args: string[];
 
-    if (config.captureMode === "window") {
-      const windowId = await findZoomWindowId();
-      if (windowId) {
-        args = [`-l${windowId}`, "-x", filepath];
+    if (config.captureMode === "window" || config.captureMode === "video") {
+      const window = await findZoomWindow();
+      if (window) {
+        if (config.captureMode === "video") {
+          const m = config.videoMargins;
+          const rx = window.x + m.left;
+          const ry = window.y + m.top;
+          const rw = window.width - m.left - m.right;
+          const rh = window.height - m.top - m.bottom;
+          args = ["-R", `${rx},${ry},${rw},${rh}`, "-x", filepath];
+        } else {
+          args = [`-l${window.id}`, "-x", filepath];
+        }
       } else {
         console.warn("Zoom Meeting window not found, falling back to full screen");
         args = ["-x", filepath];
@@ -199,6 +234,7 @@ wss.on("connection", (ws) => {
       if (msg.type === "update-config") {
         if (msg.saveDir) config.saveDir = msg.saveDir;
         if (msg.captureMode) config.captureMode = msg.captureMode;
+        if (msg.videoMargins) config.videoMargins = { ...config.videoMargins, ...msg.videoMargins };
         await saveConfig();
         console.log(`Config updated: mode=${config.captureMode}, dir=${config.saveDir}`);
         for (const client of wss.clients) {

@@ -3,3 +3,5 @@ dist/
 .env
 *.local
 SECRETS.local.md
+.DS_Store
+.claude/

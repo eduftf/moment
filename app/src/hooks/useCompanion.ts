@@ -3,7 +3,7 @@ import type { CaptureCommand } from "../types";
 
 export interface CompanionConfig {
   saveDir: string;
-  captureMode: "window" | "screen";
+  captureMode: "window" | "screen" | "video";
 }
 
 // Use same-origin WebSocket via Vite proxy (works through tunnel)

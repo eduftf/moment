@@ -10,6 +10,7 @@ class MockWebSocket {
 
   readyState = MockWebSocket.OPEN;
   onopen: (() => void) | null = null;
+  onmessage: ((event: { data: string }) => void) | null = null;
   onclose: (() => void) | null = null;
   onerror: (() => void) | null = null;
   send = vi.fn();
@@ -139,6 +140,103 @@ describe("useCompanion", () => {
     });
 
     expect(result.current.connected).toBe(false);
+  });
+
+  it("config starts as null", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    expect(result.current.config).toBeNull();
+  });
+
+  it("sets config when receiving config message", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    act(() => {
+      ws.onmessage?.({
+        data: JSON.stringify({
+          type: "config",
+          saveDir: "/Users/test/Moment",
+          captureMode: "window",
+        }),
+      });
+    });
+
+    expect(result.current.config).toEqual({
+      saveDir: "/Users/test/Moment",
+      captureMode: "window",
+    });
+  });
+
+  it("resets config to null on disconnect", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    // First set config via message
+    act(() => {
+      ws.onmessage?.({
+        data: JSON.stringify({
+          type: "config",
+          saveDir: "/Users/test/Moment",
+          captureMode: "screen",
+        }),
+      });
+    });
+
+    expect(result.current.config).not.toBeNull();
+
+    // Simulate disconnect
+    act(() => {
+      ws.readyState = MockWebSocket.CLOSED;
+      ws.onclose?.();
+    });
+
+    expect(result.current.config).toBeNull();
+  });
+
+  it("updateConfig sends correct message via WebSocket", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    act(() => {
+      result.current.updateConfig({ saveDir: "/new/path" });
+    });
+
+    expect(ws.send).toHaveBeenCalledWith(
+      JSON.stringify({ type: "update-config", saveDir: "/new/path" })
+    );
+  });
+
+  it("updateConfig does nothing when not connected", () => {
+    const { result } = renderHook(() => useCompanion());
+
+    const ws = MockWebSocket.instances[0];
+    ws.readyState = MockWebSocket.CLOSED;
+
+    act(() => {
+      result.current.updateConfig({ captureMode: "screen" });
+    });
+
+    expect(ws.send).not.toHaveBeenCalled();
   });
 
   it("cleans up on unmount", async () => {

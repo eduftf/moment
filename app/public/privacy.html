@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Moment</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background-color: #fafafa;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+    }
+
+    .subtitle a {
+      color: #666;
+      text-decoration: none;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .subtitle a:hover {
+      color: #333;
+      border-bottom-color: #999;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #222;
+      margin-top: 40px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-bottom: 14px;
+      color: #333;
+    }
+
+    ul {
+      margin: 8px 0 16px 24px;
+      color: #333;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    strong {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .highlight {
+      background-color: #eef6ec;
+      border-left: 3px solid #4a9e3f;
+      padding: 14px 18px;
+      margin: 20px 0;
+      border-radius: 0 4px 4px 0;
+      font-size: 15px;
+      color: #2d5e26;
+    }
+
+    .contact-box {
+      background-color: #f0f0f0;
+      padding: 20px 24px;
+      border-radius: 6px;
+      margin-top: 16px;
+    }
+
+    .contact-box a {
+      color: #1a6dd4;
+      text-decoration: none;
+    }
+
+    .contact-box a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 56px;
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 13px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Privacy Policy</h1>
+      <p class="subtitle">
+        <strong>Moment</strong> &mdash; a Zoom App by
+        <a href="https://gtools.space">gtools.space</a> (Mykhailo Gorkusha)<br>
+        Effective date: February 26, 2026
+      </p>
+    </header>
+
+    <h2>Overview</h2>
+    <p>
+      Moment is a Zoom App that captures screenshots during meetings, triggered by
+      emoji reactions, participant count peaks, or manual clicks. This policy explains
+      what data Moment accesses, how it is used, and where it is stored.
+    </p>
+
+    <div class="highlight">
+      Moment stores all data locally on your computer. No screenshots, meeting data,
+      or personal information is sent to external servers.
+    </div>
+
+    <h2>What Data We Access</h2>
+    <p>
+      When you use Moment during a Zoom meeting, the app accesses the following
+      information through the Zoom Apps SDK:
+    </p>
+    <ul>
+      <li>Meeting topic</li>
+      <li>Participant names and participant count</li>
+      <li>Emoji reactions</li>
+      <li>Timestamps of captured screenshots</li>
+    </ul>
+    <p>
+      Moment uses the <strong>zoomapp:inmeeting</strong> OAuth scope to read meeting
+      context, detect reactions, and observe participant changes.
+    </p>
+
+    <h2>How We Use Your Data</h2>
+    <p>The data accessed by Moment is used solely to:</p>
+    <ul>
+      <li>Detect trigger events (reactions, participant peaks) for screenshot capture</li>
+      <li>Organize and label saved screenshots with relevant meeting context</li>
+    </ul>
+    <p>
+      We do not use your data for analytics, advertising, profiling, or any purpose
+      other than the core functionality described above.
+    </p>
+
+    <h2>Data Storage</h2>
+    <p>
+      All screenshots and associated metadata are saved <strong>locally</strong> on your
+      computer in the <code>~/Moment/</code> folder via a local companion CLI tool.
+      Nothing is uploaded to cloud services or external servers operated by us or any
+      third party.
+    </p>
+    <p>
+      Because your data never leaves your machine, you have full control over it. You
+      can view, move, or delete your files at any time.
+    </p>
+
+    <h2>Third Parties</h2>
+    <p>
+      Moment does not share, sell, or transmit any data to third parties. The app
+      communicates only with the Zoom client through the Zoom Apps SDK. No external
+      APIs, analytics services, or advertising networks are used.
+    </p>
+
+    <h2>Cookies and Tracking</h2>
+    <p>
+      Moment does not use cookies, local storage tokens, analytics scripts, or any
+      form of tracking technology.
+    </p>
+
+    <h2>Security</h2>
+    <p>
+      Since all data remains on your local machine, security depends on your own
+      device protections (disk encryption, OS-level access controls, etc.). We
+      recommend keeping your operating system and Zoom client up to date.
+    </p>
+
+    <h2>Children's Privacy</h2>
+    <p>
+      Moment is not directed at children under 13 and does not knowingly collect
+      personal information from children.
+    </p>
+
+    <h2>Changes to This Policy</h2>
+    <p>
+      We may update this privacy policy from time to time. Any changes will be
+      reflected on this page with an updated effective date. Continued use of Moment
+      after changes constitutes acceptance of the revised policy.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      If you have questions or concerns about this privacy policy or the Moment app,
+      please reach out:
+    </p>
+    <div class="contact-box">
+      <strong>Mykhailo Gorkusha</strong><br>
+      gtools.space<br>
+      <a href="mailto:gtools.space@gmail.com">gtools.space@gmail.com</a>
+    </div>
+
+    <footer>
+      &copy; 2026 gtools.space. All rights reserved.
+    </footer>
+  </div>
+</body>
+</html>

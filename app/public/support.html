@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moment - Support</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a2e;
+      background: #f8f9fb;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin-top: 0.75rem;
+      font-size: 1.125rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* --- About section --- */
+    .about {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      margin-bottom: 2.5rem;
+    }
+
+    .about h2 {
+      font-size: 1.35rem;
+      margin-bottom: 0.75rem;
+      color: #2563eb;
+    }
+
+    .about p {
+      color: #444;
+    }
+
+    /* --- FAQ section --- */
+    .faq h2 {
+      font-size: 1.35rem;
+      margin-bottom: 1.25rem;
+      color: #2563eb;
+    }
+
+    .faq-item {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      margin-bottom: 1rem;
+    }
+
+    .faq-item h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1a1a2e;
+    }
+
+    .faq-item p {
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .faq-item code {
+      background: #f0f0f5;
+      padding: 0.15em 0.45em;
+      border-radius: 5px;
+      font-size: 0.88em;
+      font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      color: #7c3aed;
+    }
+
+    /* --- Contact section --- */
+    .contact {
+      margin-top: 2.5rem;
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      text-align: center;
+    }
+
+    .contact h2 {
+      font-size: 1.35rem;
+      margin-bottom: 0.75rem;
+      color: #2563eb;
+    }
+
+    .contact p {
+      color: #555;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .contact a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .contact a:hover {
+      text-decoration: underline;
+    }
+
+    .contact .links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .contact .links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #999;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Moment Support</h1>
+    <p>A Zoom App that captures screenshots during your meetings so you never miss an important moment.</p>
+  </header>
+
+  <main>
+    <section class="about">
+      <h2>About Moment</h2>
+      <p>
+        Moment is a Zoom App that automatically captures screenshots during meetings.
+        It works alongside a lightweight companion tool running on your computer.
+        Screenshots can be triggered by a thumbs-up reaction, when participant count
+        hits a new peak, or with a manual Capture Now button. Every screenshot is
+        neatly organized into folders by meeting topic so you can revisit key moments later.
+      </p>
+    </section>
+
+    <section class="faq">
+      <h2>Frequently Asked Questions</h2>
+
+      <div class="faq-item">
+        <h3>How do I install the companion tool?</h3>
+        <p>
+          Open a terminal and run <code>npm install -g moment-capture</code>, then start
+          it by running <code>moment-capture</code>. The companion tool needs to stay
+          running in the background while you use Moment inside Zoom.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Why does it say "Companion: Not running"?</h3>
+        <p>
+          This means the companion tool is not currently active on your machine. Moment
+          communicates with the companion over a local connection. Make sure you have
+          started <code>moment-capture</code> in a terminal window and that it is still
+          running.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Where are screenshots saved?</h3>
+        <p>
+          Screenshots are saved to the <code>~/Moment/{meeting-topic}/</code> folder in
+          your home directory. Each meeting gets its own subfolder named after the
+          meeting topic, keeping everything organized.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Can I change the save folder?</h3>
+        <p>
+          Yes. Open the Settings panel inside the Moment app during a meeting and you
+          can configure a custom save location.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What triggers a screenshot?</h3>
+        <p>
+          There are three triggers: a <strong>thumbs-up reaction</strong> during the
+          meeting, a <strong>new participant peak</strong> (when the number of
+          participants reaches a new high), or the manual <strong>Capture Now</strong>
+          button inside the app.
+        </p>
+      </div>
+    </section>
+
+    <section class="contact">
+      <h2>Contact Us</h2>
+      <p>Have a question or running into an issue? Reach out and we will be happy to help.</p>
+      <div class="links">
+        <a href="mailto:gtools.space@gmail.com">gtools.space@gmail.com</a>
+        <a href="https://github.com/eduftf/moment" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2026 Moment. All rights reserved.
+  </footer>
+</body>
+</html>

@@ -8,6 +8,7 @@ import { StatusBar } from "./components/StatusBar";
 import { TriggerSettings } from "./components/TriggerSettings";
 import { MomentsList } from "./components/MomentsList";
 import { CaptureButton } from "./components/CaptureButton";
+import { Settings } from "./components/Settings";
 import type { Moment, CaptureCommand } from "./types";
 
 export default function App() {
@@ -107,6 +108,9 @@ export default function App() {
       />
       <MomentsList moments={moments} />
       <CaptureButton onClick={handleManualCapture} />
+      {companion.config && (
+        <Settings config={companion.config} onUpdate={companion.updateConfig} />
+      )}
     </div>
   );
 }

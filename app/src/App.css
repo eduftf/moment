@@ -113,3 +113,32 @@ h3 {
 }
 .capture-btn:hover { background: #1d4ed8; }
 .capture-btn:active { background: #1e40af; }
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  gap: 8px;
+}
+
+.setting-label {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.setting-select,
+.setting-input {
+  font-size: 13px;
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+}
+
+.setting-select { min-width: 120px; }
+
+.setting-input {
+  flex: 1;
+  min-width: 0;
+}

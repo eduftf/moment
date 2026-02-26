@@ -1,11 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { CaptureCommand } from "../types";
 
-const WS_URL = "ws://localhost:54321";
+export interface CompanionConfig {
+  saveDir: string;
+  captureMode: "window" | "screen";
+}
+
+// Use same-origin WebSocket via Vite proxy (works through tunnel)
+const WS_URL = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws-companion`;
 const RECONNECT_MS = 5000;
 
 export function useCompanion() {
   const [connected, setConnected] = useState(false);
+  const [config, setConfig] = useState<CompanionConfig | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout>>();
 
@@ -17,8 +24,18 @@ export function useCompanion() {
 
       ws.onopen = () => setConnected(true);
 
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "config") {
+            setConfig({ saveDir: msg.saveDir, captureMode: msg.captureMode });
+          }
+        } catch {}
+      };
+
       ws.onclose = () => {
         setConnected(false);
+        setConfig(null);
         wsRef.current = null;
         reconnectTimer.current = setTimeout(connect, RECONNECT_MS);
       };
@@ -43,11 +60,16 @@ export function useCompanion() {
 
   const capture = useCallback((command: CaptureCommand): boolean => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      return false; // companion not available
+      return false;
     }
     wsRef.current.send(JSON.stringify(command));
     return true;
   }, []);
 
-  return { connected, capture };
+  const updateConfig = useCallback((updates: Partial<CompanionConfig>) => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+    wsRef.current.send(JSON.stringify({ type: "update-config", ...updates }));
+  }, []);
+
+  return { connected, config, capture, updateConfig };
 }

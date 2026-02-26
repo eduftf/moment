@@ -32,6 +32,25 @@ const DEFAULT_CONFIG: Config = {
 
 let config: Config = { ...DEFAULT_CONFIG };
 
+interface ArchiveData {
+  meeting: {
+    topic: string;
+    id: string;
+    uuid: string;
+    startTime: string;
+    endTime: string | null;
+  };
+  events: any[];
+  screenshots: Array<{
+    filename: string;
+    timestamp: string;
+    trigger: string;
+    participantCount: number;
+  }>;
+}
+
+let activeArchive: { dir: string; data: ArchiveData } | null = null;
+
 async function loadConfig(): Promise<void> {
   try {
     const raw = await readFile(CONFIG_PATH, "utf-8");
@@ -175,28 +194,104 @@ async function takeScreenshot(filepath: string): Promise<void> {
 }
 
 async function handleCapture(data: CaptureCommand): Promise<string> {
-  const dir = join(config.saveDir, sanitize(data.meetingTopic));
-  await mkdir(dir, { recursive: true });
-
   const ts = formatTimestamp(data.timestamp);
   const baseName = `${ts}_${data.trigger}`;
-  const pngPath = join(dir, `${baseName}.png`);
-  const jsonPath = join(dir, `${baseName}.json`);
+  let pngPath: string;
 
-  await takeScreenshot(pngPath);
+  if (activeArchive) {
+    const dir = join(activeArchive.dir, "images");
+    await mkdir(dir, { recursive: true });
+    pngPath = join(dir, `${baseName}.png`);
+    await takeScreenshot(pngPath);
 
-  const metadata = {
-    timestamp: data.timestamp,
-    trigger: data.trigger,
-    participants: data.participants,
-    participantCount: data.participantCount,
-    meetingTopic: data.meetingTopic,
-    captureMode: config.captureMode,
-  };
-  await writeFile(jsonPath, JSON.stringify(metadata, null, 2));
+    activeArchive.data.screenshots.push({
+      filename: `${baseName}.png`,
+      timestamp: data.timestamp,
+      trigger: data.trigger,
+      participantCount: data.participantCount,
+    });
+    activeArchive.data.events.push({
+      type: "screenshot",
+      timestamp: data.timestamp,
+      trigger: data.trigger,
+      filename: `${baseName}.png`,
+      participantCount: data.participantCount,
+    });
+    await writeArchive();
+  } else {
+    const dir = join(config.saveDir, sanitize(data.meetingTopic));
+    await mkdir(dir, { recursive: true });
+    pngPath = join(dir, `${baseName}.png`);
+    await takeScreenshot(pngPath);
+
+    const jsonPath = join(dir, `${baseName}.json`);
+    const metadata = {
+      timestamp: data.timestamp,
+      trigger: data.trigger,
+      participants: data.participants,
+      participantCount: data.participantCount,
+      meetingTopic: data.meetingTopic,
+      captureMode: config.captureMode,
+    };
+    await writeFile(jsonPath, JSON.stringify(metadata, null, 2));
+  }
 
   console.log(`Captured: ${pngPath}`);
   return pngPath;
+}
+
+// --- Archive helpers ---
+
+async function startArchive(msg: {
+  meetingTopic: string;
+  meetingId: string;
+  meetingUUID: string;
+  startTime: string;
+}): Promise<string> {
+  const date = formatTimestamp(msg.startTime).split("_")[0]; // YYYY-MM-DD
+  const dirName = `${sanitize(msg.meetingTopic)}-${date}`;
+  const dir = join(config.saveDir, dirName);
+  await mkdir(join(dir, "images"), { recursive: true });
+
+  const data: ArchiveData = {
+    meeting: {
+      topic: msg.meetingTopic,
+      id: msg.meetingId,
+      uuid: msg.meetingUUID,
+      startTime: msg.startTime,
+      endTime: null,
+    },
+    events: [],
+    screenshots: [],
+  };
+
+  activeArchive = { dir, data };
+  await writeArchive();
+  console.log(`Archive started: ${dir}`);
+  return dir;
+}
+
+async function writeArchive(): Promise<void> {
+  if (!activeArchive) return;
+  const jsonPath = join(activeArchive.dir, "archive.json");
+  await writeFile(jsonPath, JSON.stringify(activeArchive.data, null, 2));
+  const { buildArchiveHtml } = await import("./archive-template.js");
+  const html = buildArchiveHtml(activeArchive.data);
+  await writeFile(join(activeArchive.dir, "archive.html"), html);
+}
+
+async function addArchiveEvent(event: any): Promise<void> {
+  if (!activeArchive) return;
+  activeArchive.data.events.push(event);
+  await writeArchive();
+}
+
+async function endArchive(): Promise<void> {
+  if (!activeArchive) return;
+  activeArchive.data.meeting.endTime = new Date().toISOString();
+  await writeArchive();
+  console.log(`Archive ended: ${activeArchive.dir}`);
+  activeArchive = null;
 }
 
 // --- Server ---
@@ -244,6 +339,19 @@ wss.on("connection", (ws) => {
 
       if (msg.type === "get-config") {
         ws.send(JSON.stringify({ type: "config", ...config }));
+      }
+
+      if (msg.type === "start-archive") {
+        const path = await startArchive(msg);
+        ws.send(JSON.stringify({ type: "archive-started", path }));
+      }
+
+      if (msg.type === "archive-event") {
+        await addArchiveEvent(msg.event);
+      }
+
+      if (msg.type === "end-archive") {
+        await endArchive();
       }
     } catch (e) {
       console.error("Error:", e);

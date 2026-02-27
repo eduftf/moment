@@ -23,6 +23,10 @@ export default defineConfig({
         ws: true,
         rewriteWsOrigin: true,
       },
+      "/companion-api": {
+        target: "http://localhost:54321",
+        rewrite: (path) => path.replace(/^\/companion-api/, ""),
+      },
     },
   },
   test: {

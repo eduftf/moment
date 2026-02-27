@@ -7,6 +7,7 @@ export interface Moment {
   meetingTopic: string;
   captured: boolean; // true if companion took the screenshot
   emoji?: string;
+  screenshotPath?: string;
 }
 
 export interface CaptureCommand {
@@ -107,3 +108,12 @@ export interface ArchiveEventCommand {
 export interface EndArchiveCommand {
   type: "end-archive";
 }
+
+export const ZOOM_REACTIONS = [
+  { emoji: "\u{1F44D}", unicode: "U+1F44D", label: "Thumbs up" },
+  { emoji: "\u{1F44F}", unicode: "U+1F44F", label: "Clap" },
+  { emoji: "\u{2764}\u{FE0F}", unicode: "U+2764", label: "Heart" },
+  { emoji: "\u{1F602}", unicode: "U+1F602", label: "Laugh" },
+  { emoji: "\u{1F62E}", unicode: "U+1F62E", label: "Surprised" },
+  { emoji: "\u{1F389}", unicode: "U+1F389", label: "Party" },
+] as const;

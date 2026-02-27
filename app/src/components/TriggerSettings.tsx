@@ -1,3 +1,5 @@
+import { ZOOM_REACTIONS } from "../types";
+
 interface Props {
   reactionEnabled: boolean;
   peakEnabled: boolean;
@@ -7,7 +9,7 @@ interface Props {
   onToggleEmoji?: (unicode: string) => void;
 }
 
-export function TriggerSettings({ reactionEnabled, peakEnabled, onToggleReaction, onTogglePeak }: Props) {
+export function TriggerSettings({ reactionEnabled, peakEnabled, onToggleReaction, onTogglePeak, allowedReactions, onToggleEmoji }: Props) {
   return (
     <div className="section">
       <div className="card">
@@ -23,6 +25,21 @@ export function TriggerSettings({ reactionEnabled, peakEnabled, onToggleReaction
             <span className="toggle-thumb" />
           </label>
         </div>
+        {reactionEnabled && allowedReactions && onToggleEmoji && (
+          <div className="emoji-picker-row">
+            {ZOOM_REACTIONS.map(r => (
+              <button
+                key={r.unicode}
+                className={`emoji-btn${allowedReactions.includes(r.unicode) ? " selected" : ""}`}
+                onClick={() => onToggleEmoji(r.unicode)}
+                aria-label={r.label}
+                type="button"
+              >
+                {r.emoji}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="trigger-row">
           <div className="trigger-info">
             <div className="trigger-icon peak">&#128200;</div>

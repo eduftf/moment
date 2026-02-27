@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MomentsList } from "./MomentsList";
 import type { Moment } from "../types";
 
@@ -73,5 +74,88 @@ describe("MomentsList", () => {
 
     expect(screen.getByText("Reaction")).toBeInTheDocument();
     expect(screen.getByText("\u2764")).toBeInTheDocument();
+  });
+
+  it("shows thumbnail when screenshotPath is set", () => {
+    render(
+      <MomentsList
+        moments={[makeMoment({ screenshotPath: "test/img.png" })]}
+      />
+    );
+
+    const thumb = screen.getByAltText("Screenshot");
+    expect(thumb).toBeInTheDocument();
+    expect(thumb).toHaveAttribute(
+      "src",
+      expect.stringContaining("/companion-api/image?path=")
+    );
+  });
+
+  it("does not show thumbnail without screenshotPath", () => {
+    render(<MomentsList moments={[makeMoment()]} />);
+
+    expect(screen.queryByAltText("Screenshot")).not.toBeInTheDocument();
+  });
+
+  it("expands moment on click when screenshotPath is set", async () => {
+    const user = userEvent.setup();
+    render(
+      <MomentsList
+        moments={[makeMoment({ screenshotPath: "test/img.png" })]}
+      />
+    );
+
+    const li = screen.getByRole("listitem");
+    await user.click(li);
+
+    expect(screen.getByAltText("Screenshot full")).toBeInTheDocument();
+  });
+
+  it("shows delete button when expanded with onDeleteMoment", async () => {
+    const user = userEvent.setup();
+    render(
+      <MomentsList
+        moments={[makeMoment({ screenshotPath: "test/img.png" })]}
+        onDeleteMoment={() => {}}
+      />
+    );
+
+    const li = screen.getByRole("listitem");
+    await user.click(li);
+
+    expect(screen.getByText("Delete")).toBeInTheDocument();
+  });
+
+  it("calls onDeleteMoment when delete clicked", async () => {
+    const user = userEvent.setup();
+    const onDelete = vi.fn();
+    render(
+      <MomentsList
+        moments={[makeMoment({ id: "m1", screenshotPath: "test/img.png" })]}
+        onDeleteMoment={onDelete}
+      />
+    );
+
+    const li = screen.getByRole("listitem");
+    await user.click(li);
+    await user.click(screen.getByText("Delete"));
+
+    expect(onDelete).toHaveBeenCalledWith("m1");
+  });
+
+  it("collapses expanded moment on second click", async () => {
+    const user = userEvent.setup();
+    render(
+      <MomentsList
+        moments={[makeMoment({ screenshotPath: "test/img.png" })]}
+      />
+    );
+
+    const li = screen.getByRole("listitem");
+    await user.click(li);
+    expect(screen.getByAltText("Screenshot full")).toBeInTheDocument();
+
+    await user.click(li);
+    expect(screen.queryByAltText("Screenshot full")).not.toBeInTheDocument();
   });
 });

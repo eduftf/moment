@@ -2,8 +2,8 @@
 
 import { WebSocketServer } from "ws";
 import { execFile } from "node:child_process";
-import { mkdir, writeFile, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdir, writeFile, readFile, unlink } from "node:fs/promises";
+import { join, resolve } from "node:path";
 import { homedir, platform } from "node:os";
 import { createServer } from "node:http";
 import { sanitize, formatTimestamp } from "./utils.js";
@@ -22,6 +22,7 @@ interface Config {
   saveDir: string;
   captureMode: "window" | "screen" | "video";
   videoMargins: VideoMargins;
+  allowedReactions?: string[];
 }
 
 const DEFAULT_CONFIG: Config = {
@@ -298,7 +299,43 @@ async function endArchive(): Promise<void> {
 
 await loadConfig();
 
-const server = createServer((_req, res) => {
+const server = createServer(async (req, res) => {
+  const url = new URL(req.url || "/", `http://localhost:${PORT}`);
+
+  if (url.pathname === "/image") {
+    const filePath = url.searchParams.get("path");
+    if (!filePath) {
+      res.writeHead(400, { "Content-Type": "text/plain" });
+      res.end("Missing path parameter");
+      return;
+    }
+
+    const normalizedResolved = resolve(join(config.saveDir, filePath));
+    const normalizedBase = resolve(config.saveDir);
+
+    if (!normalizedResolved.startsWith(normalizedBase)) {
+      res.writeHead(403, { "Content-Type": "text/plain" });
+      res.end("Forbidden");
+      return;
+    }
+
+    try {
+      const data = await readFile(normalizedResolved);
+      const ext = normalizedResolved.split(".").pop()?.toLowerCase();
+      const mime = ext === "png" ? "image/png" : ext === "jpg" || ext === "jpeg" ? "image/jpeg" : "application/octet-stream";
+      res.writeHead(200, {
+        "Content-Type": mime,
+        "Cache-Control": "public, max-age=3600",
+        "Access-Control-Allow-Origin": "*",
+      });
+      res.end(data);
+    } catch {
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      res.end("Not found");
+    }
+    return;
+  }
+
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Moment Companion OK");
 });
@@ -323,13 +360,22 @@ wss.on("connection", (ws) => {
 
       if (msg.type === "capture") {
         const path = await handleCapture(msg as CaptureCommand);
-        ws.send(JSON.stringify({ type: "captured", timestamp: msg.timestamp, path }));
+        const relativePath = path.startsWith(config.saveDir)
+          ? path.slice(config.saveDir.length + 1)
+          : path;
+        ws.send(JSON.stringify({
+          type: "captured",
+          timestamp: msg.timestamp,
+          path,
+          imageUrl: `/companion-api/image?path=${encodeURIComponent(relativePath)}`,
+        }));
       }
 
       if (msg.type === "update-config") {
         if (msg.saveDir) config.saveDir = msg.saveDir;
         if (msg.captureMode) config.captureMode = msg.captureMode;
         if (msg.videoMargins) config.videoMargins = { ...config.videoMargins, ...msg.videoMargins };
+        if (msg.allowedReactions !== undefined) config.allowedReactions = msg.allowedReactions;
         await saveConfig();
         console.log(`Config updated: mode=${config.captureMode}, dir=${config.saveDir}`);
         for (const client of wss.clients) {
@@ -352,6 +398,33 @@ wss.on("connection", (ws) => {
 
       if (msg.type === "end-archive") {
         await endArchive();
+      }
+
+      if (msg.type === "delete-screenshot") {
+        const filePath = msg.path;
+        const normalizedPath = resolve(filePath);
+        const normalizedBase = resolve(config.saveDir);
+        if (normalizedPath.startsWith(normalizedBase)) {
+          try {
+            await unlink(normalizedPath);
+            if (activeArchive) {
+              const filename = normalizedPath.split("/").pop();
+              activeArchive.data.screenshots = activeArchive.data.screenshots.filter(
+                (s: any) => s.filename !== filename
+              );
+              activeArchive.data.events = activeArchive.data.events.filter(
+                (e: any) => !(e.type === "screenshot" && e.filename === filename)
+              );
+              await writeArchive();
+            }
+            ws.send(JSON.stringify({ type: "deleted", path: filePath }));
+            console.log(`Deleted: ${filePath}`);
+          } catch (e) {
+            ws.send(JSON.stringify({ type: "error", message: `Failed to delete: ${e}` }));
+          }
+        } else {
+          ws.send(JSON.stringify({ type: "error", message: "Path outside save directory" }));
+        }
       }
     } catch (e) {
       console.error("Error:", e);

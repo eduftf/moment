@@ -379,4 +379,83 @@ describe("useCompanion", () => {
       JSON.stringify({ type: "end-archive" })
     );
   });
+
+  it("includes allowedReactions in config when present", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    act(() => {
+      ws.onmessage?.({
+        data: JSON.stringify({
+          type: "config",
+          saveDir: "/Users/test/Moment",
+          captureMode: "window",
+          allowedReactions: ["U+1F44D", "U+2764"],
+        }),
+      });
+    });
+
+    expect(result.current.config).toEqual({
+      saveDir: "/Users/test/Moment",
+      captureMode: "window",
+      allowedReactions: ["U+1F44D", "U+2764"],
+    });
+  });
+
+  it("calls onCaptured callback when captured message has imageUrl", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const cb = vi.fn();
+    act(() => {
+      result.current.setOnCaptured(cb);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    act(() => {
+      ws.onmessage?.({
+        data: JSON.stringify({
+          type: "captured",
+          timestamp: "2024-03-15T14:30:45.000Z",
+          path: "/some/path.png",
+          imageUrl: "/companion-api/image?path=/some/path.png",
+        }),
+      });
+    });
+
+    expect(cb).toHaveBeenCalledWith(
+      "2024-03-15T14:30:45.000Z",
+      "/companion-api/image?path=/some/path.png",
+      "/some/path.png"
+    );
+  });
+
+  it("sends delete-screenshot command", async () => {
+    const { result } = renderHook(() => useCompanion());
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+    });
+
+    const ws = MockWebSocket.instances[0];
+
+    let sent: boolean;
+    act(() => {
+      sent = result.current.deleteScreenshot("/path/to/file.png");
+    });
+
+    expect(sent!).toBe(true);
+    expect(ws.send).toHaveBeenCalledWith(
+      JSON.stringify({ type: "delete-screenshot", path: "/path/to/file.png" })
+    );
+  });
 });

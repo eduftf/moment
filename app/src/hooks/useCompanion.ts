@@ -9,6 +9,7 @@ import type {
 export interface CompanionConfig {
   saveDir: string;
   captureMode: "window" | "screen" | "video";
+  allowedReactions?: string[];
 }
 
 // Use same-origin WebSocket via Vite proxy (works through tunnel)
@@ -21,6 +22,7 @@ export function useCompanion() {
   const [archivePath, setArchivePath] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout>>();
+  const onCapturedRef = useRef<((timestamp: string, imageUrl: string, path: string) => void) | null>(null);
 
   const send = useCallback((data: object): boolean => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
@@ -42,9 +44,11 @@ export function useCompanion() {
         try {
           const msg = JSON.parse(event.data);
           if (msg.type === "config") {
-            setConfig({ saveDir: msg.saveDir, captureMode: msg.captureMode });
+            setConfig({ saveDir: msg.saveDir, captureMode: msg.captureMode, allowedReactions: msg.allowedReactions });
           } else if (msg.type === "archive-started") {
             setArchivePath(msg.path);
+          } else if (msg.type === "captured" && msg.imageUrl) {
+            onCapturedRef.current?.(msg.timestamp, msg.imageUrl, msg.path);
           }
         } catch {}
       };
@@ -102,6 +106,12 @@ export function useCompanion() {
     [send]
   );
 
+  const setOnCaptured = useCallback((cb: (timestamp: string, imageUrl: string, path: string) => void) => {
+    onCapturedRef.current = cb;
+  }, []);
+
+  const deleteScreenshot = useCallback((path: string): boolean => send({ type: "delete-screenshot", path }), [send]);
+
   return {
     connected,
     config,
@@ -111,5 +121,7 @@ export function useCompanion() {
     startArchive,
     archiveEvent,
     endArchive,
+    setOnCaptured,
+    deleteScreenshot,
   };
 }

@@ -3,6 +3,8 @@ interface Props {
   peakEnabled: boolean;
   onToggleReaction: () => void;
   onTogglePeak: () => void;
+  allowedReactions?: string[];
+  onToggleEmoji?: (unicode: string) => void;
 }
 
 export function TriggerSettings({ reactionEnabled, peakEnabled, onToggleReaction, onTogglePeak }: Props) {

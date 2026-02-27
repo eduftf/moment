@@ -10,6 +10,7 @@ import { TriggerSettings } from "./components/TriggerSettings";
 import { MomentsList } from "./components/MomentsList";
 import { CaptureButton } from "./components/CaptureButton";
 import { Settings } from "./components/Settings";
+import { ZOOM_REACTIONS } from "./types";
 import type { Moment, CaptureCommand } from "./types";
 
 export default function App() {
@@ -22,9 +23,21 @@ export default function App() {
   const [moments, setMoments] = useState<Moment[]>([]);
   const [reactionEnabled, setReactionEnabled] = useState(true);
   const [peakEnabled, setPeakEnabled] = useState(true);
+  const [allowedReactions, setAllowedReactions] = useState<string[]>(
+    ZOOM_REACTIONS.map(r => r.unicode)
+  );
   const meetingTopicRef = useRef("Meeting");
   const idCounter = useRef(0);
   const participantsRef = useRef<ParticipantState>({ current: 1, peak: 1, names: [] });
+  const syncedFromRemote = useRef(false);
+
+  const toggleReaction = useCallback((unicode: string) => {
+    setAllowedReactions(prev =>
+      prev.includes(unicode)
+        ? prev.filter(u => u !== unicode)
+        : [...prev, unicode]
+    );
+  }, []);
 
   // Fetch meeting topic once SDK is ready
   useEffect(() => {
@@ -78,11 +91,46 @@ export default function App() {
   useReactionTrigger({
     enabled: reactionEnabled && sdk.status === "ready",
     onTrigger: (emoji: string, _unicode: string) => addMoment("reaction", emoji),
+    allowedReactions,
   });
 
   const handleManualCapture = useCallback(() => {
     addMoment("manual");
   }, [addMoment]);
+
+  // Sync allowedReactions to companion
+  useEffect(() => {
+    companion.updateConfig({ allowedReactions });
+  }, [allowedReactions, companion.updateConfig]);
+
+  // Sync allowedReactions from companion on initial connect
+  useEffect(() => {
+    if (companion.config?.allowedReactions && !syncedFromRemote.current) {
+      syncedFromRemote.current = true;
+      setAllowedReactions(companion.config.allowedReactions);
+    }
+  }, [companion.config?.allowedReactions]);
+
+  // Register onCaptured callback
+  useEffect(() => {
+    companion.setOnCaptured((timestamp: string, imageUrl: string, path: string) => {
+      setMoments(prev => prev.map(m =>
+        m.timestamp.toISOString() === timestamp
+          ? { ...m, imageUrl, screenshotPath: path }
+          : m
+      ));
+    });
+  }, [companion.setOnCaptured]);
+
+  const handleDeleteMoment = useCallback((id: string) => {
+    setMoments(prev => {
+      const moment = prev.find(m => m.id === id);
+      if (moment?.screenshotPath) {
+        companion.deleteScreenshot(moment.screenshotPath);
+      }
+      return prev.filter(m => m.id !== id);
+    });
+  }, [companion]);
 
   if (sdk.status === "loading") {
     return (
@@ -122,9 +170,11 @@ export default function App() {
         peakEnabled={peakEnabled}
         onToggleReaction={() => setReactionEnabled((v) => !v)}
         onTogglePeak={() => setPeakEnabled((v) => !v)}
+        allowedReactions={allowedReactions}
+        onToggleEmoji={toggleReaction}
       />
       <CaptureButton onClick={handleManualCapture} ready={companion.connected} />
-      <MomentsList moments={moments} />
+      <MomentsList moments={moments} onDeleteMoment={handleDeleteMoment} />
       {companion.config && (
         <Settings config={companion.config} onUpdate={companion.updateConfig} />
       )}

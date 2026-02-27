@@ -2,6 +2,7 @@ import type { Moment } from "../types";
 
 interface Props {
   moments: Moment[];
+  onDeleteMoment?: (id: string) => void;
 }
 
 function formatTime(date: Date): string {

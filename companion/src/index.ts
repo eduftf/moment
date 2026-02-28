@@ -1,15 +1,38 @@
 #!/usr/bin/env node
 
 import { WebSocketServer } from "ws";
+import type { IncomingMessage } from "node:http";
 import { execFile } from "node:child_process";
-import { mkdir, writeFile, readFile, unlink } from "node:fs/promises";
+import { mkdir, writeFile, readFile, unlink, realpath } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { homedir, platform } from "node:os";
 import { createServer } from "node:http";
 import { sanitize, formatTimestamp } from "./utils.js";
 import { isAutoStartEnabled, setupAutoStart } from "./autostart.js";
+import type { ArchiveData, ArchiveEvent } from "./types.js";
 
 const PORT = 54321;
+const HOME = homedir();
+
+/** Check if a path is safely within a base directory (resolves symlinks) */
+async function isPathWithin(targetPath: string, baseDir: string): Promise<boolean> {
+  try {
+    const realTarget = await realpath(targetPath);
+    const realBase = await realpath(baseDir);
+    return realTarget === realBase || realTarget.startsWith(realBase + "/");
+  } catch {
+    // File doesn't exist yet — fall back to string check with resolved paths
+    const resolvedTarget = resolve(targetPath);
+    const resolvedBase = resolve(baseDir);
+    return resolvedTarget === resolvedBase || resolvedTarget.startsWith(resolvedBase + "/");
+  }
+}
+
+/** Validate that a saveDir is within the user's home directory */
+function isValidSaveDir(dir: string): boolean {
+  const resolved = resolve(dir);
+  return resolved.startsWith(HOME + "/") || resolved === HOME;
+}
 const CONFIG_PATH = join(homedir(), ".moment-config.json");
 
 interface VideoMargins {
@@ -34,23 +57,6 @@ const DEFAULT_CONFIG: Config = {
 
 let config: Config = { ...DEFAULT_CONFIG };
 
-interface ArchiveData {
-  meeting: {
-    topic: string;
-    id: string;
-    uuid: string;
-    startTime: string;
-    endTime: string | null;
-  };
-  events: any[];
-  screenshots: Array<{
-    filename: string;
-    timestamp: string;
-    trigger: string;
-    participantCount: number;
-  }>;
-}
-
 let activeArchive: { dir: string; data: ArchiveData } | null = null;
 
 async function loadConfig(): Promise<void> {
@@ -64,7 +70,7 @@ async function loadConfig(): Promise<void> {
 }
 
 async function saveConfig(): Promise<void> {
-  await writeFile(CONFIG_PATH, JSON.stringify(config, null, 2));
+  await writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), { mode: 0o600 });
 }
 
 interface CaptureCommand {
@@ -164,16 +170,17 @@ async function takeScreenshot(filepath: string): Promise<void> {
   if (os === "win32") {
     return new Promise((resolve, reject) => {
       const psScript = `
+        param([string]$outPath)
         Add-Type -AssemblyName System.Windows.Forms
         $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
         $bitmap = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
         $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
         $graphics.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-        $bitmap.Save('${filepath}')
+        $bitmap.Save($outPath)
         $graphics.Dispose()
         $bitmap.Dispose()
       `;
-      execFile("powershell", ["-Command", psScript], (error) => {
+      execFile("powershell", ["-Command", psScript, "-outPath", filepath], (error) => {
         if (error) reject(error);
         else resolve();
       });
@@ -282,7 +289,7 @@ async function writeArchive(): Promise<void> {
   await writeFile(join(activeArchive.dir, "archive.html"), html);
 }
 
-async function addArchiveEvent(event: any): Promise<void> {
+async function addArchiveEvent(event: ArchiveEvent): Promise<void> {
   if (!activeArchive) return;
   activeArchive.data.events.push(event);
   await writeArchive();
@@ -325,23 +332,21 @@ async function main(): Promise<void> {
       return;
     }
 
-    const normalizedResolved = resolve(join(config.saveDir, filePath));
-    const normalizedBase = resolve(config.saveDir);
+    const targetPath = resolve(join(config.saveDir, filePath));
 
-    if (!normalizedResolved.startsWith(normalizedBase)) {
+    if (!await isPathWithin(targetPath, config.saveDir)) {
       res.writeHead(403, { "Content-Type": "text/plain" });
       res.end("Forbidden");
       return;
     }
 
     try {
-      const data = await readFile(normalizedResolved);
-      const ext = normalizedResolved.split(".").pop()?.toLowerCase();
+      const data = await readFile(targetPath);
+      const ext = targetPath.split(".").pop()?.toLowerCase();
       const mime = ext === "png" ? "image/png" : ext === "jpg" || ext === "jpeg" ? "image/jpeg" : "application/octet-stream";
       res.writeHead(200, {
         "Content-Type": mime,
         "Cache-Control": "public, max-age=3600",
-        "Access-Control-Allow-Origin": "*",
       });
       res.end(data);
     } catch {
@@ -355,10 +360,24 @@ async function main(): Promise<void> {
   res.end("Moment Companion OK");
 });
 
-const wss = new WebSocketServer({ server });
+const ALLOWED_ORIGINS = [
+  "https://moment.gtools.space",
+  "http://localhost:3000",
+  "https://localhost:3000",
+];
 
-server.listen(PORT, () => {
-  console.log(`Moment Companion listening on ws://localhost:${PORT}`);
+const wss = new WebSocketServer({
+  server,
+  verifyClient: (info: { origin: string; secure: boolean; req: IncomingMessage }) => {
+    const origin = info.origin || String(info.req.headers.origin || "");
+    // Allow connections with no origin (native apps, CLI tools)
+    if (!origin) return true;
+    return ALLOWED_ORIGINS.some((o) => origin === o || origin.endsWith(".trycloudflare.com"));
+  },
+});
+
+server.listen(PORT, "127.0.0.1", () => {
+  console.log(`Moment Companion listening on ws://127.0.0.1:${PORT}`);
   console.log(`Capture mode: ${config.captureMode}`);
   console.log(`Save directory: ${config.saveDir}`);
 });
@@ -374,6 +393,12 @@ wss.on("connection", (ws) => {
       const msg = JSON.parse(raw.toString());
 
       if (msg.type === "capture") {
+        if (!msg.trigger || !["reaction", "peak", "manual"].includes(msg.trigger) ||
+            typeof msg.timestamp !== "string" || typeof msg.meetingTopic !== "string" ||
+            typeof msg.participantCount !== "number") {
+          ws.send(JSON.stringify({ type: "error", message: "Invalid capture command" }));
+          return;
+        }
         const path = await handleCapture(msg as CaptureCommand);
         const relativePath = path.startsWith(config.saveDir)
           ? path.slice(config.saveDir.length + 1)
@@ -387,8 +412,16 @@ wss.on("connection", (ws) => {
       }
 
       if (msg.type === "update-config") {
-        if (msg.saveDir) config.saveDir = msg.saveDir;
-        if (msg.captureMode) config.captureMode = msg.captureMode;
+        if (msg.saveDir) {
+          if (!isValidSaveDir(msg.saveDir)) {
+            ws.send(JSON.stringify({ type: "error", message: "Save directory must be within home directory" }));
+            return;
+          }
+          config.saveDir = resolve(msg.saveDir);
+        }
+        if (msg.captureMode && ["window", "screen", "video"].includes(msg.captureMode)) {
+          config.captureMode = msg.captureMode;
+        }
         if (msg.videoMargins) config.videoMargins = { ...config.videoMargins, ...msg.videoMargins };
         if (msg.allowedReactions !== undefined) config.allowedReactions = msg.allowedReactions;
         await saveConfig();
@@ -403,6 +436,10 @@ wss.on("connection", (ws) => {
       }
 
       if (msg.type === "start-archive") {
+        if (typeof msg.meetingTopic !== "string" || typeof msg.startTime !== "string") {
+          ws.send(JSON.stringify({ type: "error", message: "Invalid start-archive command" }));
+          return;
+        }
         const path = await startArchive(msg);
         ws.send(JSON.stringify({ type: "archive-started", path }));
       }
@@ -417,33 +454,32 @@ wss.on("connection", (ws) => {
 
       if (msg.type === "delete-screenshot") {
         const filePath = msg.path;
-        const normalizedPath = resolve(filePath);
-        const normalizedBase = resolve(config.saveDir);
-        if (normalizedPath.startsWith(normalizedBase)) {
-          try {
-            await unlink(normalizedPath);
-            if (activeArchive) {
-              const filename = normalizedPath.split("/").pop();
-              activeArchive.data.screenshots = activeArchive.data.screenshots.filter(
-                (s: any) => s.filename !== filename
-              );
-              activeArchive.data.events = activeArchive.data.events.filter(
-                (e: any) => !(e.type === "screenshot" && e.filename === filename)
-              );
-              await writeArchive();
-            }
-            ws.send(JSON.stringify({ type: "deleted", path: filePath }));
-            console.log(`Deleted: ${filePath}`);
-          } catch (e) {
-            ws.send(JSON.stringify({ type: "error", message: `Failed to delete: ${e}` }));
-          }
-        } else {
+        if (typeof filePath !== "string" || !await isPathWithin(resolve(filePath), config.saveDir)) {
           ws.send(JSON.stringify({ type: "error", message: "Path outside save directory" }));
+          return;
+        }
+        const normalizedPath = resolve(filePath);
+        try {
+          await unlink(normalizedPath);
+          if (activeArchive) {
+            const filename = normalizedPath.split("/").pop();
+            activeArchive.data.screenshots = activeArchive.data.screenshots.filter(
+              (s) => s.filename !== filename
+            );
+            activeArchive.data.events = activeArchive.data.events.filter(
+              (e) => !(e.type === "screenshot" && e.filename === filename)
+            );
+            await writeArchive();
+          }
+          ws.send(JSON.stringify({ type: "deleted", path: filePath }));
+          console.log(`Deleted: ${filePath}`);
+        } catch {
+          ws.send(JSON.stringify({ type: "error", message: "Failed to delete file" }));
         }
       }
     } catch (e) {
-      console.error("Error:", e);
-      ws.send(JSON.stringify({ type: "error", message: String(e) }));
+      console.error("Error processing message:", e);
+      ws.send(JSON.stringify({ type: "error", message: "Internal error" }));
     }
   });
 

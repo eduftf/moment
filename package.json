@@ -3,7 +3,11 @@
   "private": true,
   "workspaces": ["app", "companion"],
   "scripts": {
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspace=app",
     "test": "npm run test:run --workspaces",
-    "test:watch": "npm run test --workspaces"
+    "test:watch": "npm run test --workspaces",
+    "typecheck": "tsc -b app companion",
+    "lint": "npm run lint --workspace=app"
   }
 }

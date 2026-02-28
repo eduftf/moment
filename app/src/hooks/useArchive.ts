@@ -33,11 +33,13 @@ export function useArchive({ sdkReady, companion }: UseArchiveOptions) {
         if (startedRef.current) return;
         startedRef.current = true;
 
+        const context = ctx as { meetingTopic?: string; meetingID?: string };
+        const uuidResult = uuid as { meetingUUID?: string };
         companionRef.current.startArchive({
           type: "start-archive",
-          meetingTopic: (ctx as any).meetingTopic || "Meeting",
-          meetingId: (ctx as any).meetingID || "",
-          meetingUUID: (uuid as any).meetingUUID || "",
+          meetingTopic: context.meetingTopic || "Meeting",
+          meetingId: context.meetingID || "",
+          meetingUUID: uuidResult.meetingUUID || "",
           startTime: new Date().toISOString(),
         });
       } catch {

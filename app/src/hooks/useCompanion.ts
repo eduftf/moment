@@ -32,6 +32,8 @@ export function useCompanion() {
     return true;
   }, []);
 
+  const connectRef = useRef<() => void>();
+
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
@@ -50,7 +52,9 @@ export function useCompanion() {
           } else if (msg.type === "captured" && msg.imageUrl) {
             onCapturedRef.current?.(msg.timestamp, msg.imageUrl, msg.path);
           }
-        } catch {}
+        } catch (e) {
+          console.error("WebSocket message error:", e);
+        }
       };
 
       ws.onclose = () => {
@@ -58,7 +62,7 @@ export function useCompanion() {
         setConfig(null);
         setArchivePath(null);
         wsRef.current = null;
-        reconnectTimer.current = setTimeout(connect, RECONNECT_MS);
+        reconnectTimer.current = setTimeout(() => connectRef.current?.(), RECONNECT_MS);
       };
 
       ws.onerror = () => {
@@ -67,9 +71,11 @@ export function useCompanion() {
 
       wsRef.current = ws;
     } catch {
-      reconnectTimer.current = setTimeout(connect, RECONNECT_MS);
+      reconnectTimer.current = setTimeout(() => connectRef.current?.(), RECONNECT_MS);
     }
   }, []);
+
+  connectRef.current = connect;
 
   useEffect(() => {
     connect();

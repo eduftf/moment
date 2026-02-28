@@ -135,9 +135,10 @@ export default function App() {
 
   const handleDeleteMoment = useCallback((id: string) => {
     setMoments(prev => {
-      const moment = prev.find(m => m.id === id);
-      if (moment?.screenshotPath) {
-        companion.deleteScreenshot(moment.screenshotPath);
+      const target = prev.find(m => m.id === id);
+      if (target?.screenshotPath) {
+        // Schedule side effect outside setState to avoid double-fire in StrictMode
+        queueMicrotask(() => companion.deleteScreenshot(target.screenshotPath!));
       }
       return prev.filter(m => m.id !== id);
     });

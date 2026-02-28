@@ -15,8 +15,10 @@ function pathSpecificHeaders(): Plugin {
         if (req.url?.startsWith("/app")) {
           res.setHeader(
             "Content-Security-Policy",
-            "frame-ancestors https://*.zoom.us",
+            "frame-ancestors https://*.zoom.us; default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' wss://*.gtools.space; img-src 'self' data:",
           );
+        } else {
+          res.setHeader("X-Frame-Options", "DENY");
         }
         next();
       });
@@ -37,7 +39,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    allowedHosts: true,
+    allowedHosts: ["moment.gtools.space", ".trycloudflare.com", ".ngrok.io"],
     // When tunneling (ngrok/cloudflared), HMR websocket must connect through the tunnel
     hmr: {
       clientPort: 443,

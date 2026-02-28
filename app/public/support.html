@@ -179,9 +179,10 @@
       <div class="faq-item">
         <h3>How do I install the companion tool?</h3>
         <p>
-          Open a terminal and run <code>npm install -g moment-capture</code>, then start
-          it by running <code>moment-capture</code>. The companion tool needs to stay
-          running in the background while you use Moment inside Zoom.
+          Download the companion from the
+          <a href="https://github.com/eduftf/moment/releases/latest" style="color:#2563eb">GitHub Releases</a>
+          page — pick the right build for your system (macOS Apple Silicon, macOS Intel, or Windows).
+          Run it once and it will auto-start in the background on future logins.
         </p>
       </div>
 
@@ -189,18 +190,18 @@
         <h3>Why does it say "Companion: Not running"?</h3>
         <p>
           This means the companion tool is not currently active on your machine. Moment
-          communicates with the companion over a local connection. Make sure you have
-          started <code>moment-capture</code> in a terminal window and that it is still
-          running.
+          communicates with the companion over a local connection. Make sure the companion
+          is running — it auto-starts after the first launch, but you can also start it
+          manually by double-clicking the downloaded file.
         </p>
       </div>
 
       <div class="faq-item">
         <h3>Where are screenshots saved?</h3>
         <p>
-          Screenshots are saved to the <code>~/Moment/{meeting-topic}/</code> folder in
-          your home directory. Each meeting gets its own subfolder named after the
-          meeting topic, keeping everything organized.
+          Each meeting gets a full archive in <code>~/Moment/{meeting-topic}-{date}/</code>.
+          Inside you'll find an <code>archive.html</code> viewer with participant data,
+          a timeline of events, and a screenshot gallery. Open it in any browser.
         </p>
       </div>
 
@@ -215,10 +216,10 @@
       <div class="faq-item">
         <h3>What triggers a screenshot?</h3>
         <p>
-          There are three triggers: a <strong>thumbs-up reaction</strong> during the
-          meeting, a <strong>new participant peak</strong> (when the number of
-          participants reaches a new high), or the manual <strong>Capture Now</strong>
-          button inside the app.
+          There are three triggers: <strong>any emoji reaction</strong> during the
+          meeting (you can choose which reactions to enable), a <strong>new participant peak</strong>
+          (when the number of participants reaches a new high), or the manual
+          <strong>Capture Now</strong> button inside the app.
         </p>
       </div>
     </section>

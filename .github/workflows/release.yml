@@ -21,6 +21,9 @@ jobs:
           - os: windows-latest
             target: node22-win-x64
             artifact: moment-companion-win-x64.exe
+          - os: ubuntu-latest
+            target: node22-linux-x64
+            artifact: moment-companion-linux-x64
 
     runs-on: ${{ matrix.os }}
 

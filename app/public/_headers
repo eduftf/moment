@@ -2,8 +2,11 @@
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
+  X-Frame-Options: DENY
 
 /app
-  Content-Security-Policy: frame-ancestors https://*.zoom.us
+  Content-Security-Policy: frame-ancestors https://*.zoom.us; default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' wss://*.gtools.space; img-src 'self' data:
+  X-Frame-Options: ALLOW-FROM https://*.zoom.us
 /app/*
-  Content-Security-Policy: frame-ancestors https://*.zoom.us
+  Content-Security-Policy: frame-ancestors https://*.zoom.us; default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' wss://*.gtools.space; img-src 'self' data:
+  X-Frame-Options: ALLOW-FROM https://*.zoom.us

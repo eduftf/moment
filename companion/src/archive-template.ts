@@ -1,21 +1,6 @@
 // companion/src/archive-template.ts
 
-interface ArchiveData {
-  meeting: {
-    topic: string;
-    id: string;
-    uuid: string;
-    startTime: string;
-    endTime: string | null;
-  };
-  events: any[];
-  screenshots: Array<{
-    filename: string;
-    timestamp: string;
-    trigger: string;
-    participantCount: number;
-  }>;
-}
+import type { ArchiveData, ArchiveEvent } from "./types.js";
 
 function escapeHtml(str: string): string {
   return str
@@ -69,16 +54,18 @@ function triggerColor(trigger: string): string {
 
 function eventColor(type: string): string {
   switch (type) {
-    case "join":
+    case "participant-join":
       return "#10b981";
-    case "leave":
+    case "participant-leave":
       return "#ef4444";
     case "reaction":
       return "#f59e0b";
-    case "speaker":
+    case "speaker-change":
       return "#06b6d4";
     case "screenshot":
       return "#8b5cf6";
+    case "feedback":
+      return "#6366f1";
     default:
       return "#6366f1";
   }
@@ -86,29 +73,31 @@ function eventColor(type: string): string {
 
 function eventIcon(type: string): string {
   switch (type) {
-    case "join":
+    case "participant-join":
       return "&#x2192;";
-    case "leave":
+    case "participant-leave":
       return "&#x2190;";
     case "reaction":
       return "&#x1F44D;";
-    case "speaker":
+    case "speaker-change":
       return "&#x1F3A4;";
     case "screenshot":
       return "&#x1F4F7;";
+    case "feedback":
+      return "&#x270B;";
     default:
       return "&#x2022;";
   }
 }
 
-function buildParticipantsHtml(events: any[]): string {
+function buildParticipantsHtml(events: ArchiveEvent[]): string {
   const participants = new Map<
     string,
     { name: string; role: string; joined: string; left: string | null }
   >();
 
   for (const ev of events) {
-    if (ev.type === "join" && ev.name) {
+    if (ev.type === "participant-join") {
       if (!participants.has(ev.name)) {
         participants.set(ev.name, {
           name: ev.name,
@@ -118,7 +107,7 @@ function buildParticipantsHtml(events: any[]): string {
         });
       }
     }
-    if (ev.type === "leave" && ev.name) {
+    if (ev.type === "participant-leave") {
       const p = participants.get(ev.name);
       if (p) p.left = ev.timestamp;
     }
@@ -154,7 +143,7 @@ function buildParticipantsHtml(events: any[]): string {
     </table>`;
 }
 
-function buildTimelineHtml(events: any[]): string {
+function buildTimelineHtml(events: ArchiveEvent[]): string {
   if (events.length === 0) {
     return '<p class="empty-state">No events recorded</p>';
   }
@@ -166,16 +155,19 @@ function buildTimelineHtml(events: any[]): string {
     const time = ev.timestamp ? formatTime(ev.timestamp) : "";
     let desc = escapeHtml(ev.type);
 
-    if (ev.type === "join" && ev.name) {
+    if (ev.type === "participant-join") {
       desc = `<strong>${escapeHtml(ev.name)}</strong> joined`;
       if (ev.role) desc += ` as ${escapeHtml(ev.role)}`;
-    } else if (ev.type === "leave" && ev.name) {
+    } else if (ev.type === "participant-leave") {
       desc = `<strong>${escapeHtml(ev.name)}</strong> left`;
-    } else if (ev.type === "reaction" && ev.name) {
-      desc = `<strong>${escapeHtml(ev.name)}</strong> reacted`;
-      if (ev.reaction) desc += ` with ${escapeHtml(ev.reaction)}`;
-    } else if (ev.type === "speaker" && ev.name) {
-      desc = `<strong>${escapeHtml(ev.name)}</strong> started speaking`;
+    } else if (ev.type === "reaction") {
+      desc = ev.name
+        ? `<strong>${escapeHtml(ev.name)}</strong> reacted`
+        : "Reaction";
+      if (ev.emoji) desc += ` ${ev.emoji}`;
+    } else if (ev.type === "speaker-change") {
+      const names = ev.speakers.map((s) => escapeHtml(s.name)).join(", ");
+      desc = names ? `<strong>${names}</strong> speaking` : "Speaker changed";
     } else if (ev.type === "screenshot") {
       desc = `Screenshot captured`;
       if (ev.trigger) desc += ` (${escapeHtml(ev.trigger)})`;
@@ -231,7 +223,7 @@ export function buildArchiveHtml(data: ArchiveData): string {
   // Count unique participants from events
   const participantNames = new Set<string>();
   for (const ev of data.events) {
-    if (ev.type === "join" && ev.name) participantNames.add(ev.name);
+    if (ev.type === "participant-join") participantNames.add(ev.name);
   }
   const participantCount = participantNames.size;
 

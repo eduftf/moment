@@ -4,7 +4,7 @@ import { usePlatform } from "./usePlatform";
 describe("usePlatform", () => {
   const originalNavigator = navigator;
 
-  function mockUserAgent(ua: string, uaData?: any) {
+  function mockUserAgent(ua: string, uaData?: { architecture?: string }) {
     Object.defineProperty(globalThis, "navigator", {
       value: {
         ...originalNavigator,

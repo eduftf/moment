@@ -20,7 +20,7 @@ export function usePlatform(): PlatformInfo {
   let arch: PlatformInfo["arch"] = os === "macos" ? "arm64" : "x64";
 
   // Chromium-based browsers (including Zoom's embedded browser) expose userAgentData
-  const uaData = (navigator as any).userAgentData;
+  const uaData = (navigator as unknown as { userAgentData?: { architecture?: string } }).userAgentData;
   if (uaData?.architecture) {
     arch = uaData.architecture === "arm" ? "arm64" : "x64";
   }

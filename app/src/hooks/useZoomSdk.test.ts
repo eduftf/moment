@@ -89,7 +89,7 @@ describe("useZoomSdk", () => {
   });
 
   it("cancels on unmount during init", async () => {
-    let resolveConfig: (v: any) => void;
+    let resolveConfig: (v: unknown) => void;
     zoomSdkMock.config.mockReturnValue(
       new Promise((r) => {
         resolveConfig = r;

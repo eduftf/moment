@@ -1,6 +1,6 @@
 import { vi } from "vitest";
 
-type Listener = (...args: any[]) => void;
+type Listener = (...args: unknown[]) => void;
 
 const listeners = new Map<string, Set<Listener>>();
 
@@ -33,7 +33,7 @@ export const zoomSdkMock = {
 };
 
 /** Emit a fake Zoom SDK event to all registered listeners */
-export function emitZoomEvent(event: string, data: any) {
+export function emitZoomEvent(event: string, data: unknown) {
   listeners.get(event)?.forEach((fn) => fn(data));
 }
 

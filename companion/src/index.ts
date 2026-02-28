@@ -7,6 +7,7 @@ import { join, resolve } from "node:path";
 import { homedir, platform } from "node:os";
 import { createServer } from "node:http";
 import { sanitize, formatTimestamp } from "./utils.js";
+import { isAutoStartEnabled, setupAutoStart } from "./autostart.js";
 
 const PORT = 54321;
 const CONFIG_PATH = join(homedir(), ".moment-config.json");
@@ -297,9 +298,23 @@ async function endArchive(): Promise<void> {
 
 // --- Server ---
 
-await loadConfig();
+async function main(): Promise<void> {
+  // CLI flags
+  if (process.argv.includes("--version")) {
+    console.log("moment-companion 0.1.0");
+    process.exit(0);
+  }
 
-const server = createServer(async (req, res) => {
+  await loadConfig();
+
+  // Auto-start setup on first run
+  if (!process.argv.includes("--no-autostart")) {
+    if (!await isAutoStartEnabled()) {
+      await setupAutoStart();
+    }
+  }
+
+  const server = createServer(async (req, res) => {
   const url = new URL(req.url || "/", `http://localhost:${PORT}`);
 
   if (url.pathname === "/image") {
@@ -433,4 +448,7 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => console.log("Zoom App disconnected"));
-});
+  });
+}
+
+main();

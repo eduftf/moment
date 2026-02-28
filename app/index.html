@@ -1,12 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moment</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moment — Capture meeting moments in Zoom</title>
+  <meta name="description" content="A Zoom App that automatically captures screenshots during meetings — triggered by reactions, participant peaks, or a manual button. Never miss an important moment.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script type="module" src="/src/landing/landing.ts"></script>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="/" class="nav-brand">Moment</a>
+    <a href="https://marketplace.zoom.us/apps/oquNvLY1QWa7tEArRu1xow" target="_blank" rel="noopener noreferrer" class="nav-cta">
+      Add to Zoom
+    </a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="reveal hero-badge">
+        <span class="hero-badge-dot"></span>
+        Zoom App
+      </div>
+      <h1 class="reveal">Capture the <em>moments</em><br>that matter</h1>
+      <p class="reveal hero-sub">
+        A Zoom App that automatically screenshots your meetings when
+        reactions fire, participant count peaks, or you hit capture.
+        Every moment saved, organized by meeting.
+      </p>
+      <div class="reveal hero-actions">
+        <a href="https://marketplace.zoom.us/apps/oquNvLY1QWa7tEArRu1xow" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          Add to Zoom
+        </a>
+        <a href="#download" class="btn btn-ghost">
+          Download Companion
+        </a>
+      </div>
+    </div>
+    <div class="viewfinder" aria-hidden="true">
+      <div class="viewfinder-inner"></div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section" id="how">
+    <div class="section-inner">
+      <div class="reveal">
+        <p class="section-label">How it works</p>
+        <h2 class="section-title">Up and running in three steps</h2>
+        <p class="section-desc">
+          Moment runs inside Zoom as a sidebar app. A lightweight companion on your
+          computer handles the screenshots.
+        </p>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <h3>Add to Zoom</h3>
+          <p>Install Moment from the Zoom App Marketplace. It appears as a sidebar panel during your meetings.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">2</div>
+          <h3>Download Companion</h3>
+          <p>A small helper app runs on your computer to capture screenshots. Download once, it auto-starts on login.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">3</div>
+          <h3>Moments captured</h3>
+          <p>Screenshots are taken automatically on reactions, participant peaks, or manual trigger. All saved locally to your machine.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="section-inner">
+      <div class="reveal">
+        <p class="section-label">Features</p>
+        <h2 class="section-title">Smart triggers, beautiful archive</h2>
+        <p class="section-desc">
+          Multiple ways to capture the right moment, all organized into a meeting archive you can revisit.
+        </p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon reaction">&#128079;</div>
+          <h3>Reaction capture</h3>
+          <p>Any emoji reaction in the meeting triggers a screenshot. Choose which reactions to track in settings.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon peak">&#128200;</div>
+          <h3>Peak participants</h3>
+          <p>Automatically captures when participant count hits a new high — perfect for recording full attendance.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon manual">&#128247;</div>
+          <h3>Manual capture</h3>
+          <p>One tap on the Capture button takes an instant screenshot. Quick, simple, always available.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feature-icon archive">&#128218;</div>
+          <h3>Meeting archive</h3>
+          <p>Every meeting gets its own folder with all screenshots, participant data, and a browsable gallery.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download -->
+  <section class="section download-section" id="download">
+    <div class="section-inner">
+      <div class="reveal">
+        <p class="section-label">Download</p>
+        <h2 class="section-title">Get the Companion</h2>
+        <p class="section-desc">
+          A lightweight helper that runs in the background and captures screenshots when Moment asks. Download for your platform.
+        </p>
+      </div>
+      <div class="download-grid">
+        <a href="https://github.com/eduftf/moment/releases/latest/download/moment-companion-macos-arm64" class="dl-card reveal">
+          <span class="dl-card-icon">&#63743;</span>
+          <span class="dl-card-label">macOS</span>
+          <span class="dl-card-sub">Apple Silicon (M1/M2/M3)</span>
+        </a>
+        <a href="https://github.com/eduftf/moment/releases/latest/download/moment-companion-macos-x64" class="dl-card reveal">
+          <span class="dl-card-icon">&#63743;</span>
+          <span class="dl-card-label">macOS</span>
+          <span class="dl-card-sub">Intel</span>
+        </a>
+        <a href="https://github.com/eduftf/moment/releases/latest/download/moment-companion-win-x64.exe" class="dl-card reveal">
+          <span class="dl-card-icon">&#128187;</span>
+          <span class="dl-card-label">Windows</span>
+          <span class="dl-card-sub">64-bit</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <div class="reveal">
+      <h2 class="section-title">Never miss a meeting moment again</h2>
+      <a href="https://marketplace.zoom.us/apps/oquNvLY1QWa7tEArRu1xow" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        Add Moment to Zoom
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/support">Support</a>
+      <a href="/terms">Terms of Use</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="https://github.com/eduftf/moment" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Moment. All rights reserved.</p>
+  </footer>
+
+</body>
 </html>

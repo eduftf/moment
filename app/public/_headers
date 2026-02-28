@@ -2,4 +2,8 @@
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
+
+/app
+  Content-Security-Policy: frame-ancestors https://*.zoom.us
+/app/*
   Content-Security-Policy: frame-ancestors https://*.zoom.us

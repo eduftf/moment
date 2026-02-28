@@ -1,21 +1,46 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vite";
+import type { Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+
+function pathSpecificHeaders(): Plugin {
+  return {
+    name: "path-specific-headers",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        res.setHeader("Strict-Transport-Security", "max-age=31536000");
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("Referrer-Policy", "no-referrer");
+        if (req.url?.startsWith("/app")) {
+          res.setHeader(
+            "Content-Security-Policy",
+            "frame-ancestors https://*.zoom.us",
+          );
+        }
+        next();
+      });
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), pathSpecificHeaders()],
+  build: {
+    rollupOptions: {
+      input: {
+        landing: resolve(__dirname, "index.html"),
+        app: resolve(__dirname, "app.html"),
+        "auth/callback": resolve(__dirname, "auth/callback.html"),
+      },
+    },
+  },
   server: {
     port: 3000,
     allowedHosts: true,
     // When tunneling (ngrok/cloudflared), HMR websocket must connect through the tunnel
     hmr: {
       clientPort: 443,
-    },
-    headers: {
-      "Strict-Transport-Security": "max-age=31536000",
-      "X-Content-Type-Options": "nosniff",
-      "Referrer-Policy": "no-referrer",
-      "Content-Security-Policy": "frame-ancestors https://*.zoom.us",
     },
     proxy: {
       "/ws-companion": {

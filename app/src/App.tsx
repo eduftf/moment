@@ -10,6 +10,7 @@ import { TriggerSettings } from "./components/TriggerSettings";
 import { MomentsList } from "./components/MomentsList";
 import { CaptureButton } from "./components/CaptureButton";
 import { Settings } from "./components/Settings";
+import { CompanionOnboarding } from "./components/CompanionOnboarding";
 import { ZOOM_REACTIONS } from "./types";
 import type { Moment, CaptureCommand } from "./types";
 
@@ -30,6 +31,7 @@ export default function App() {
   const idCounter = useRef(0);
   const participantsRef = useRef<ParticipantState>({ current: 1, peak: 1, names: [] });
   const syncedFromRemote = useRef(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const toggleReaction = useCallback((unicode: string) => {
     setAllowedReactions(prev =>
@@ -122,6 +124,15 @@ export default function App() {
     });
   }, [companion.setOnCaptured]);
 
+  // Show onboarding for first-time users when companion not connected
+  useEffect(() => {
+    if (companion.connected || localStorage.getItem("moment-setup-complete") === "true") {
+      return;
+    }
+    const timer = setTimeout(() => setShowOnboarding(true), 3000);
+    return () => clearTimeout(timer);
+  }, [companion.connected]);
+
   const handleDeleteMoment = useCallback((id: string) => {
     setMoments(prev => {
       const moment = prev.find(m => m.id === id);
@@ -177,6 +188,12 @@ export default function App() {
       <MomentsList moments={moments} onDeleteMoment={handleDeleteMoment} />
       {companion.config && (
         <Settings config={companion.config} onUpdate={companion.updateConfig} />
+      )}
+      {showOnboarding && (
+        <CompanionOnboarding
+          connected={companion.connected}
+          onDismiss={() => setShowOnboarding(false)}
+        />
       )}
     </div>
   );

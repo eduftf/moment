@@ -3,6 +3,13 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CompanionOnboarding } from "./CompanionOnboarding";
 
+// Mock Zoom SDK
+vi.mock("@zoom/appssdk", () => ({
+  default: {
+    openUrl: vi.fn().mockResolvedValue({ message: "success" }),
+  },
+}));
+
 // Mock the usePlatform hook
 vi.mock("../hooks/usePlatform", () => ({
   usePlatform: () => ({
@@ -30,9 +37,9 @@ describe("CompanionOnboarding", () => {
   it("shows platform-specific download button", () => {
     render(<CompanionOnboarding connected={false} onDismiss={() => {}} />);
 
-    const link = screen.getByText("Download for macOS");
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute("href", expect.stringContaining("moment-companion-macos-arm64"));
+    const btn = screen.getByText("Download for macOS");
+    expect(btn).toBeInTheDocument();
+    expect(btn.tagName).toBe("BUTTON");
   });
 
   it("shows waiting spinner when not connected", () => {
@@ -62,11 +69,20 @@ describe("CompanionOnboarding", () => {
   it("advances to step 2 when download clicked", async () => {
     render(<CompanionOnboarding connected={false} onDismiss={() => {}} />);
 
-    const link = screen.getByText("Download for macOS");
-    await userEvent.click(link);
+    const btn = screen.getByText("Download for macOS");
+    await userEvent.click(btn);
 
-    // Step 2 should now be active (has "active" class)
     const step2 = screen.getByText("Open the file").closest(".onboarding-step");
     expect(step2?.className).toContain("active");
+  });
+
+  it("has a close button that calls onDismiss", async () => {
+    const onDismiss = vi.fn();
+    render(<CompanionOnboarding connected={false} onDismiss={onDismiss} />);
+
+    const closeBtn = screen.getByLabelText("Close");
+    expect(closeBtn).toBeInTheDocument();
+    await userEvent.click(closeBtn);
+    expect(onDismiss).toHaveBeenCalledOnce();
   });
 });

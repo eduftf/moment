@@ -23,6 +23,7 @@ export const zoomSdkMock = {
   getMeetingUUID: vi.fn().mockResolvedValue({
     meetingUUID: "test-uuid-abc123",
   }),
+  openUrl: vi.fn().mockResolvedValue({ message: "success" }),
   addEventListener: vi.fn((event: string, handler: Listener) => {
     if (!listeners.has(event)) listeners.set(event, new Set());
     listeners.get(event)!.add(handler);

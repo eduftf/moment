@@ -712,6 +712,7 @@ body {
 }
 
 .onboarding-card {
+  position: relative;
   background: var(--bg-surface);
   backdrop-filter: var(--backdrop);
   -webkit-backdrop-filter: var(--backdrop);
@@ -723,6 +724,25 @@ body {
   width: 100%;
   animation: card-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 0.1s;
+}
+
+.onboarding-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.onboarding-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 @keyframes card-in {

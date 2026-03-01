@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import zoomSdk from "@zoom/appssdk";
 import { usePlatform } from "../hooks/usePlatform";
 
 interface Props {
@@ -22,9 +23,17 @@ export function CompanionOnboarding({ connected, onDismiss }: Props) {
 
   const osLabel = platform.os === "macos" ? "macOS" : platform.os === "windows" ? "Windows" : "Linux";
 
+  const handleDownload = useCallback(() => {
+    zoomSdk.openUrl({ url: platform.downloadUrl }).catch(() => {
+      window.open(platform.downloadUrl, "_blank");
+    });
+    setStep(2);
+  }, [platform.downloadUrl]);
+
   return (
     <div className={`onboarding-overlay${fadeOut ? " fade-out" : ""}`}>
       <div className="onboarding-card">
+        <button className="onboarding-close" onClick={onDismiss} aria-label="Close">&times;</button>
         <div className="onboarding-header">
           <div className="app-logo">M</div>
           <h2 className="onboarding-title">Set up Moment</h2>
@@ -39,15 +48,12 @@ export function CompanionOnboarding({ connected, onDismiss }: Props) {
             <div className="step-content">
               <span className="step-title">Download Companion</span>
               <span className="step-detail">{osLabel} detected</span>
-              <a
+              <button
                 className="onboarding-btn"
-                href={platform.downloadUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setStep(2)}
+                onClick={handleDownload}
               >
                 Download for {osLabel}
-              </a>
+              </button>
             </div>
           </div>
 

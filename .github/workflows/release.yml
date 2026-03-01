@@ -15,15 +15,19 @@ jobs:
           - os: macos-14
             target: node22-macos-arm64
             artifact: moment-companion-macos-arm64
+            arch: arm64
           - os: macos-14
             target: node22-macos-x64
             artifact: moment-companion-macos-x64
+            arch: x64
           - os: windows-latest
             target: node22-win-x64
             artifact: moment-companion-win-x64.exe
+            arch: ""
           - os: ubuntu-latest
             target: node22-linux-x64
             artifact: moment-companion-linux-x64
+            arch: ""
 
     runs-on: ${{ matrix.os }}
 
@@ -46,11 +50,23 @@ jobs:
         if: runner.os != 'Windows'
         run: chmod +x companion/dist/${{ matrix.artifact }}
 
-      - name: Sign binary (macOS)
+      - name: Create macOS .app bundle
         if: runner.os == 'macOS'
-        run: codesign --sign - --force companion/dist/${{ matrix.artifact }}
+        run: |
+          mkdir -p "Moment Companion.app/Contents/MacOS"
+          cp companion/macos-app/Info.plist "Moment Companion.app/Contents/"
+          cp companion/dist/${{ matrix.artifact }} "Moment Companion.app/Contents/MacOS/moment-companion"
+          codesign --sign - --force "Moment Companion.app"
+          ditto -c -k --keepParent "Moment Companion.app" "Moment-Companion-macos-${{ matrix.arch }}.zip"
 
       - uses: actions/upload-artifact@v4
+        if: runner.os == 'macOS'
+        with:
+          name: Moment-Companion-macos-${{ matrix.arch }}.zip
+          path: Moment-Companion-macos-${{ matrix.arch }}.zip
+
+      - uses: actions/upload-artifact@v4
+        if: runner.os != 'macOS'
         with:
           name: ${{ matrix.artifact }}
           path: companion/dist/${{ matrix.artifact }}

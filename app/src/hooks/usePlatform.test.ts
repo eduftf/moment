@@ -29,8 +29,8 @@ describe("usePlatform", () => {
     const result = usePlatform();
     expect(result.os).toBe("macos");
     expect(result.arch).toBe("arm64");
-    expect(result.filename).toBe("moment-companion-macos-arm64");
-    expect(result.downloadUrl).toContain("moment-companion-macos-arm64");
+    expect(result.filename).toBe("Moment-Companion-macos-arm64.zip");
+    expect(result.downloadUrl).toContain("Moment-Companion-macos-arm64.zip");
   });
 
   it("detects Windows", () => {
@@ -48,7 +48,7 @@ describe("usePlatform", () => {
     const result = usePlatform();
     expect(result.os).toBe("macos");
     expect(result.arch).toBe("x64");
-    expect(result.filename).toBe("moment-companion-macos-x64");
+    expect(result.filename).toBe("Moment-Companion-macos-x64.zip");
   });
 
   it("detects arm64 from userAgentData", () => {

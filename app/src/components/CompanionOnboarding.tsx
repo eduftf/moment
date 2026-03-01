@@ -63,7 +63,7 @@ export function CompanionOnboarding({ connected, onDismiss }: Props) {
               <span className="step-title">Open the file</span>
               <span className="step-detail">
                 {platform.os === "macos"
-                  ? "Double-click the downloaded file. If blocked, go to System Settings \u2192 Privacy & Security \u2192 Open Anyway."
+                  ? "Open Moment Companion from Downloads. If macOS asks to confirm, click Open."
                   : "Double-click the .exe file. If SmartScreen appears, click More info \u2192 Run anyway."}
               </span>
             </div>
@@ -75,8 +75,8 @@ export function CompanionOnboarding({ connected, onDismiss }: Props) {
               <span className="step-title">Done!</span>
               <span className="step-detail">
                 {connected
-                  ? "Companion connected. It will auto-start on login."
-                  : "Companion will start automatically on login."}
+                  ? "Companion connected. It will stop automatically after the meeting."
+                  : "Companion will stop automatically when the meeting ends."}
               </span>
             </div>
           </div>

@@ -59,6 +59,11 @@ let config: Config = { ...DEFAULT_CONFIG };
 
 let activeArchive: { dir: string; data: ArchiveData } | null = null;
 
+// Idle auto-quit: exit when no WebSocket clients connected for 60s
+let hadConnection = false;
+let idleTimer: NodeJS.Timeout | null = null;
+const IDLE_TIMEOUT = 60_000;
+
 async function loadConfig(): Promise<void> {
   try {
     const raw = await readFile(CONFIG_PATH, "utf-8");
@@ -303,6 +308,19 @@ async function endArchive(): Promise<void> {
   activeArchive = null;
 }
 
+// --- Graceful shutdown ---
+
+async function shutdown(server?: ReturnType<typeof createServer>, wss?: WebSocketServer): Promise<void> {
+  console.log("Shutting down...");
+  if (activeArchive) await endArchive();
+  if (wss) wss.close();
+  if (server) server.close();
+  process.exit(0);
+}
+
+process.on("SIGTERM", () => shutdown());
+process.on("SIGINT", () => shutdown());
+
 // --- Server ---
 
 async function main(): Promise<void> {
@@ -314,8 +332,8 @@ async function main(): Promise<void> {
 
   await loadConfig();
 
-  // Auto-start setup on first run
-  if (!process.argv.includes("--no-autostart")) {
+  // Auto-start setup only when explicitly requested
+  if (process.argv.includes("--autostart")) {
     if (!await isAutoStartEnabled()) {
       await setupAutoStart();
     }
@@ -383,6 +401,8 @@ server.listen(PORT, "127.0.0.1", () => {
 });
 
 wss.on("connection", (ws) => {
+  hadConnection = true;
+  if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
   console.log("Zoom App connected");
 
   // Send current config to the app
@@ -483,7 +503,13 @@ wss.on("connection", (ws) => {
     }
   });
 
-  ws.on("close", () => console.log("Zoom App disconnected"));
+  ws.on("close", () => {
+    console.log("Zoom App disconnected");
+    if (wss.clients.size === 0 && hadConnection) {
+      console.log(`No connections. Shutting down in ${IDLE_TIMEOUT / 1000}s...`);
+      idleTimer = setTimeout(() => shutdown(server, wss), IDLE_TIMEOUT);
+    }
+  });
   });
 }
 

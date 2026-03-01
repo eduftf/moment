@@ -29,7 +29,7 @@ export function usePlatform(): PlatformInfo {
   if (os === "windows") {
     filename = "moment-companion-win-x64.exe";
   } else if (os === "macos") {
-    filename = `moment-companion-macos-${arch}`;
+    filename = `Moment-Companion-macos-${arch}.zip`;
   } else {
     filename = "moment-companion-linux-x64";
   }

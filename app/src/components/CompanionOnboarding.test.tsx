@@ -15,8 +15,8 @@ vi.mock("../hooks/usePlatform", () => ({
   usePlatform: () => ({
     os: "macos" as const,
     arch: "arm64" as const,
-    downloadUrl: "https://github.com/eduftf/moment/releases/latest/download/moment-companion-macos-arm64",
-    filename: "moment-companion-macos-arm64",
+    downloadUrl: "https://github.com/eduftf/moment/releases/latest/download/Moment-Companion-macos-arm64.zip",
+    filename: "Moment-Companion-macos-arm64.zip",
   }),
 }));
 

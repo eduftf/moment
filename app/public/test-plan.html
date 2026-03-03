@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moment — Zoom App Test Plan</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a2e;
+      background: #f8f9fb;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.02em; }
+    header p { margin-top: 0.75rem; font-size: 1.125rem; opacity: 0.9; max-width: 650px; margin-left: auto; margin-right: auto; }
+
+    main { max-width: 800px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+    section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      margin-bottom: 1rem;
+      color: #2563eb;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e8ecf4;
+    }
+
+    h3 { font-size: 1.05rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #1a1a2e; }
+    p { color: #444; font-size: 0.95rem; margin-bottom: 0.75rem; }
+    ul, ol { color: #444; font-size: 0.95rem; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    li { margin-bottom: 0.4rem; }
+
+    code {
+      background: #f0f0f5;
+      padding: 0.15em 0.45em;
+      border-radius: 5px;
+      font-size: 0.88em;
+      font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      color: #7c3aed;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+    th { background: #f0f4ff; text-align: left; padding: 0.6rem 0.75rem; font-weight: 600; color: #2563eb; border-bottom: 2px solid #e8ecf4; }
+    td { padding: 0.55rem 0.75rem; border-bottom: 1px solid #eee; color: #444; }
+    tr:last-child td { border-bottom: none; }
+
+    .test-case {
+      background: #fafbfd;
+      border: 1px solid #e8ecf4;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .test-case h3 { margin-top: 0; color: #2563eb; font-size: 1rem; }
+    .test-case .expected { background: #f0f4ff; border-left: 3px solid #2563eb; padding: 0.5rem 0.75rem; border-radius: 0 6px 6px 0; margin-top: 0.5rem; font-size: 0.9rem; }
+
+    .info-box {
+      background: #f0f4ff;
+      border-left: 3px solid #2563eb;
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+      vertical-align: middle;
+      margin-right: 0.4rem;
+    }
+
+    footer { text-align: center; padding: 2rem 1rem; color: #999; font-size: 0.85rem; }
+    footer a { color: #999; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      header { padding: 2rem 1rem; }
+      header h1 { font-size: 1.75rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      section { padding: 1.5rem; }
+      table { font-size: 0.8rem; }
+      th, td { padding: 0.4rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Moment — Test Plan</h1>
+    <p>Comprehensive test plan for the Moment Zoom App covering authorization, scopes, and all functionality.</p>
+  </header>
+
+  <main>
+
+    <!-- Overview -->
+    <section>
+      <h2>Overview</h2>
+      <p>Moment is a Zoom App that captures screenshots during meetings. It consists of two components:</p>
+      <ol>
+        <li><strong>Zoom App</strong> — a sidebar panel that runs inside Zoom meetings (iframe via <code>@zoom/appssdk</code>), listens for meeting events, and sends capture commands.</li>
+        <li><strong>Companion</strong> — a lightweight desktop application that runs locally on the user's computer, receives capture commands via WebSocket, and takes screenshots using the OS-native screenshot tool.</li>
+      </ol>
+      <p><strong>App URL:</strong> <a href="https://moment.gtools.space">https://moment.gtools.space</a></p>
+      <p><strong>Documentation:</strong> <a href="https://moment.gtools.space/docs">https://moment.gtools.space/docs</a></p>
+      <p><strong>Companion Download:</strong> <a href="https://github.com/eduftf/moment/releases/latest">GitHub Releases</a></p>
+    </section>
+
+    <!-- Prerequisites -->
+    <section>
+      <h2>Prerequisites</h2>
+      <ul>
+        <li>A Zoom account with the Moment app installed</li>
+        <li>The Moment Companion app downloaded and running on your computer</li>
+        <li>A Zoom meeting with at least one other participant (for reaction/peak triggers)</li>
+      </ul>
+    </section>
+
+    <!-- Test Credentials -->
+    <section>
+      <h2>Test Credentials</h2>
+      <p><strong>Production Client ID:</strong> <code>oquNvLY1QWa7tEArRu1xow</code></p>
+      <p>To test the app:</p>
+      <ol>
+        <li>Install Moment from the <a href="https://marketplace.zoom.us/apps/oquNvLY1QWa7tEArRu1xow">Zoom Marketplace listing</a></li>
+        <li>Download the Companion from <a href="https://github.com/eduftf/moment/releases/latest">GitHub Releases</a></li>
+        <li>No additional account or login is required — Moment uses Zoom's built-in OAuth</li>
+      </ol>
+    </section>
+
+    <!-- 1. Authorization Flow -->
+    <section>
+      <h2>1. Authorization Flow</h2>
+
+      <div class="test-case">
+        <h3><span class="badge">1.1</span> App Installation</h3>
+        <ol>
+          <li>Go to the Moment listing on Zoom Marketplace</li>
+          <li>Click <strong>Add</strong></li>
+          <li>Review the requested permissions (in-meeting access)</li>
+          <li>Click <strong>Authorize</strong></li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> App is added to your Zoom account. You see a confirmation page.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">1.2</span> OAuth Callback</h3>
+        <ol>
+          <li>After authorizing, the browser redirects to the OAuth callback URL</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> The callback page loads successfully at <code>moment.gtools.space/auth/callback</code></div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">1.3</span> Opening the App in a Meeting</h3>
+        <ol>
+          <li>Start or join a Zoom meeting</li>
+          <li>Click the <strong>Apps</strong> button in the bottom meeting toolbar</li>
+          <li>Select <strong>Moment</strong> from the apps list</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> The Moment sidebar panel opens on the right side of the meeting window. The Zoom SDK initializes and the sidebar shows connection status.</div>
+      </div>
+    </section>
+
+    <!-- 2. Scopes and Capabilities -->
+    <section>
+      <h2>2. Scopes and Capabilities</h2>
+      <p>Moment requests the <code>zoomapp:inmeeting</code> scope, which provides access to the following capabilities:</p>
+
+      <table>
+        <tr><th>Capability</th><th>Purpose</th><th>How to Test</th></tr>
+        <tr><td><code>onReaction</code></td><td>Listen for legacy emoji reactions</td><td>Send a legacy reaction during a meeting</td></tr>
+        <tr><td><code>onEmojiReaction</code></td><td>Listen for new emoji reactions</td><td>Send an emoji reaction during a meeting</td></tr>
+        <tr><td><code>onParticipantChange</code></td><td>Track participant join/leave events</td><td>Have participants join and leave the meeting</td></tr>
+        <tr><td><code>onActiveSpeakerChange</code></td><td>Track who is currently speaking</td><td>Multiple participants speak in turn</td></tr>
+        <tr><td><code>onFeedbackReaction</code></td><td>Listen for feedback reactions (raised hand, yes/no)</td><td>Use raised hand feature</td></tr>
+        <tr><td><code>getMeetingParticipants</code></td><td>Get current participant list</td><td>App displays participant count in status bar</td></tr>
+        <tr><td><code>getMeetingContext</code></td><td>Get meeting topic and ID</td><td>Used for naming archive folders</td></tr>
+        <tr><td><code>getMeetingUUID</code></td><td>Get unique meeting identifier</td><td>Stored in archive metadata</td></tr>
+        <tr><td><code>getUserContext</code></td><td>Get current user's name and role</td><td>Displayed in app status</td></tr>
+      </table>
+
+      <div class="test-case">
+        <h3><span class="badge">2.1</span> SDK Initialization</h3>
+        <ol>
+          <li>Open Moment in a Zoom meeting</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Status bar shows "Zoom: Connected" and displays your name and participant count.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">2.2</span> Unsupported API Handling</h3>
+        <ol>
+          <li>Open Moment in a meeting on a Zoom client version that may not support all APIs</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> App gracefully handles unsupported APIs with console warnings. Core functionality still works.</div>
+      </div>
+    </section>
+
+    <!-- 3. Functionality Testing -->
+    <section>
+      <h2>3. Functionality Testing</h2>
+
+      <h3>Companion Connection</h3>
+
+      <div class="test-case">
+        <h3><span class="badge">3.1</span> Companion Connection</h3>
+        <ol>
+          <li>Ensure the Companion app is running on your computer</li>
+          <li>Open Moment in a Zoom meeting</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Status bar shows "Companion: Connected". The companion auto-discovers via WebSocket on <code>localhost:54321</code>.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.2</span> Companion Disconnection</h3>
+        <ol>
+          <li>Open Moment in a meeting with the Companion running</li>
+          <li>Quit the Companion app</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Status bar changes to "Companion: Not running". After approximately 3 seconds, a setup overlay appears suggesting to download the Companion.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.3</span> Companion Reconnection</h3>
+        <ol>
+          <li>With Moment open and Companion disconnected, restart the Companion</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Status bar updates to "Companion: Connected" within 5 seconds (auto-reconnect interval).</div>
+      </div>
+
+      <h3>Reaction Capture</h3>
+
+      <div class="test-case">
+        <h3><span class="badge">3.4</span> Reaction Capture (Automatic Trigger)</h3>
+        <ol>
+          <li>Open Moment in a meeting with Companion connected</li>
+          <li>Ensure the "Reaction Capture" toggle is enabled in the sidebar</li>
+          <li>Have a participant send an emoji reaction (e.g., thumbs up, clap, heart)</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> A screenshot is captured. A new moment appears in the Moments list in the sidebar with the reaction emoji, trigger type "reaction", and timestamp. The screenshot PNG file is saved to <code>~/Moment/{meeting-topic}-{date}/images/</code>.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.5</span> Reaction Debounce</h3>
+        <ol>
+          <li>Send multiple emoji reactions rapidly (within 5 seconds)</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Only one screenshot is captured per 5-second window. Subsequent reactions within the cooldown are ignored.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.6</span> Reaction Emoji Filter</h3>
+        <ol>
+          <li>Open trigger settings and select specific reactions (e.g., only thumbs up)</li>
+          <li>Send a heart reaction</li>
+          <li>Send a thumbs up reaction</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> No screenshot for heart (not in allowed list). Screenshot captured for thumbs up.</div>
+      </div>
+
+      <h3>Peak Detection</h3>
+
+      <div class="test-case">
+        <h3><span class="badge">3.7</span> Peak Detection (Automatic Trigger)</h3>
+        <ol>
+          <li>Open Moment in a meeting with Companion connected</li>
+          <li>Ensure the "Peak Detection" toggle is enabled</li>
+          <li>Start with 2 participants. Have a 3rd participant join.</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Participant count increases. When count exceeds previous maximum, a screenshot is captured with trigger type "peak".</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.8</span> Peak Detection Cooldown</h3>
+        <ol>
+          <li>After a peak trigger fires, have another participant join within 2 minutes</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> The new peak is recorded, but no screenshot is captured until the 2-minute cooldown expires.</div>
+      </div>
+
+      <h3>Manual Capture</h3>
+
+      <div class="test-case">
+        <h3><span class="badge">3.9</span> Manual Capture</h3>
+        <ol>
+          <li>Open Moment in a meeting with Companion connected</li>
+          <li>Click the <strong>Capture</strong> button in the sidebar</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> A screenshot is captured immediately. A new moment appears in the list with trigger type "manual".</div>
+      </div>
+
+      <h3>Moments List & Archive</h3>
+
+      <div class="test-case">
+        <h3><span class="badge">3.10</span> Moments List</h3>
+        <ol>
+          <li>Capture several screenshots using different triggers</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> All moments are listed chronologically in the sidebar. Each shows a thumbnail, trigger type (reaction/peak/manual), and timestamp.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.11</span> Delete a Moment</h3>
+        <ol>
+          <li>In the Moments list, click the delete button on a captured moment</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> The moment is removed from the list and the corresponding PNG file is deleted from disk.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.12</span> Meeting Archive</h3>
+        <ol>
+          <li>Open Moment in a meeting. Capture a few screenshots. End the meeting.</li>
+          <li>Navigate to <code>~/Moment/</code> on your computer.</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> A folder named <code>{meeting-topic}-{YYYY-MM-DD}/</code> containing: <code>archive.html</code> (timeline + gallery viewer), <code>archive.json</code> (raw data), and <code>images/</code> folder with PNG screenshots.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.13</span> Archive HTML Viewer</h3>
+        <ol>
+          <li>Open the <code>archive.html</code> file in a web browser</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> A self-contained page with meeting header, participant timeline, event list, and screenshot gallery.</div>
+      </div>
+
+      <h3>Settings</h3>
+
+      <div class="test-case">
+        <h3><span class="badge">3.14</span> Settings — Save Location</h3>
+        <ol>
+          <li>Open Settings in the sidebar, change the save location</li>
+          <li>Capture a screenshot</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Screenshot saved to the new custom folder.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.15</span> Settings — Capture Mode</h3>
+        <ol>
+          <li>Open Settings, change capture mode (Window / Screen / Video with margins)</li>
+          <li>Capture a screenshot</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Screenshot reflects the selected capture mode.</div>
+      </div>
+
+      <h3>Companion Onboarding</h3>
+
+      <div class="test-case">
+        <h3><span class="badge">3.16</span> Companion Onboarding</h3>
+        <ol>
+          <li>Open Moment in a meeting without the Companion running</li>
+          <li>Wait 3 seconds</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> An onboarding overlay appears with download links for the Companion app.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">3.17</span> Cross-Platform Screenshot</h3>
+        <ol>
+          <li><strong>macOS:</strong> Run Companion and capture → uses native <code>screencapture</code></li>
+          <li><strong>Windows:</strong> Run Companion and capture → uses PowerShell screen capture</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Screenshots captured correctly on each platform.</div>
+      </div>
+    </section>
+
+    <!-- 4. Privacy and Security -->
+    <section>
+      <h2>4. Privacy and Security</h2>
+
+      <div class="test-case">
+        <h3><span class="badge">4.1</span> Local-Only Data</h3>
+        <ol>
+          <li>Capture screenshots during a meeting</li>
+          <li>Monitor network traffic</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> No screenshot data is sent to any external server. All data stays on the local machine. The Companion only communicates via <code>localhost:54321</code>.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">4.2</span> WebSocket Security</h3>
+        <ol>
+          <li>The Companion WebSocket server only accepts connections from localhost</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> External connections to port 54321 are rejected.</div>
+      </div>
+    </section>
+
+    <!-- 5. Edge Cases -->
+    <section>
+      <h2>5. Edge Cases</h2>
+
+      <div class="test-case">
+        <h3><span class="badge">5.1</span> No Companion Running</h3>
+        <ol>
+          <li>Open Moment without the Companion installed or running</li>
+          <li>Try to use reaction/peak/manual triggers</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Sidebar shows "Companion: Not running" and an onboarding overlay. Triggers fire but moments are marked as "Missed" (no screenshot file saved).</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">5.2</span> Meeting with One Participant</h3>
+        <ol>
+          <li>Open Moment in a meeting where you are the only participant</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> Peak detection shows 1 participant. Reaction trigger and manual capture work normally.</div>
+      </div>
+
+      <div class="test-case">
+        <h3><span class="badge">5.3</span> Long Meeting</h3>
+        <ol>
+          <li>Run Moment for an extended meeting (30+ minutes)</li>
+        </ol>
+        <div class="expected"><strong>Expected:</strong> All triggers continue to work. Archive accumulates events and screenshots without issues.</div>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <section>
+      <h2>Summary</h2>
+      <table>
+        <tr><th>Feature</th><th>Trigger</th><th>Expected Behavior</th></tr>
+        <tr><td>Reaction Capture</td><td>Emoji reaction sent in meeting</td><td>Screenshot captured (5s debounce)</td></tr>
+        <tr><td>Peak Detection</td><td>New participant maximum reached</td><td>Screenshot captured (2min cooldown)</td></tr>
+        <tr><td>Manual Capture</td><td>Click "Capture" button</td><td>Screenshot captured immediately</td></tr>
+        <tr><td>Meeting Archive</td><td>Meeting ends / sidebar closes</td><td>HTML + JSON + images saved locally</td></tr>
+        <tr><td>Companion Connection</td><td>WebSocket on localhost:54321</td><td>Auto-connect, auto-reconnect</td></tr>
+        <tr><td>Settings</td><td>User configuration</td><td>Save location, capture mode, emoji filter</td></tr>
+      </table>
+    </section>
+
+  </main>
+
+  <footer>
+    <a href="/">Moment</a> &middot; <a href="/docs">Docs</a> &middot; <a href="/support">Support</a>
+    <br>&copy; 2026 Moment. All rights reserved.
+  </footer>
+</body>
+</html>

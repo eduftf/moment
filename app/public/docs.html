@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moment - Documentation</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a2e;
+      background: #f8f9fb;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      padding: 3rem 1.5rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin-top: 0.75rem;
+      font-size: 1.125rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    nav.toc {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      margin-bottom: 2.5rem;
+    }
+
+    nav.toc h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 0.75rem;
+    }
+
+    nav.toc ol {
+      padding-left: 1.25rem;
+    }
+
+    nav.toc li {
+      margin-bottom: 0.35rem;
+    }
+
+    nav.toc a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    nav.toc a:hover {
+      text-decoration: underline;
+    }
+
+    section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      margin-bottom: 2rem;
+    }
+
+    section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      color: #2563eb;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e8ecf4;
+    }
+
+    section h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #1a1a2e;
+    }
+
+    section p {
+      color: #444;
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+
+    section ul, section ol {
+      color: #444;
+      font-size: 0.95rem;
+      padding-left: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    section li {
+      margin-bottom: 0.45rem;
+    }
+
+    code {
+      background: #f0f0f5;
+      padding: 0.15em 0.45em;
+      border-radius: 5px;
+      font-size: 0.88em;
+      font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      color: #7c3aed;
+    }
+
+    .step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.1rem;
+    }
+
+    .step-content h3 {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+
+    .step-content p {
+      margin-bottom: 0.35rem;
+    }
+
+    .note {
+      background: #f0f4ff;
+      border-left: 3px solid #2563eb;
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .warning {
+      background: #fef3c7;
+      border-left: 3px solid #f59e0b;
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #999;
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: #999;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 2rem 1rem; }
+      header h1 { font-size: 1.75rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      section { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Moment Documentation</h1>
+    <p>Learn how to install, use, and manage the Moment Zoom App for capturing meeting screenshots.</p>
+  </header>
+
+  <main>
+    <nav class="toc">
+      <h2>Contents</h2>
+      <ol>
+        <li><a href="#adding">Adding the App</a></li>
+        <li><a href="#usage">Usage</a></li>
+        <li><a href="#removing">Removing the App</a></li>
+      </ol>
+    </nav>
+
+    <!-- ==================== ADDING THE APP ==================== -->
+    <section id="adding">
+      <h2>1. Adding the App</h2>
+      <p>Moment consists of two parts: the <strong>Zoom App</strong> (runs inside your Zoom meeting as a sidebar panel) and the <strong>Companion</strong> (a lightweight desktop helper that captures screenshots on your computer).</p>
+
+      <h3>Install the Zoom App</h3>
+
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <h3>Open the Zoom Marketplace</h3>
+          <p>Visit the <a href="https://marketplace.zoom.us/apps/oquNvLY1QWa7tEArRu1xow" target="_blank" rel="noopener noreferrer">Moment listing on Zoom Marketplace</a> or search for "Moment" in the Zoom App Marketplace.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <h3>Click "Add"</h3>
+          <p>Click the <strong>Add</strong> button on the Moment listing page. You will be prompted to authorize the app. Moment requests the following permissions:</p>
+          <ul>
+            <li><strong>In-Meeting access</strong> — allows the app to run as a sidebar panel inside your Zoom meetings and receive meeting events (reactions, participant changes).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <h3>Authorize</h3>
+          <p>Review the permissions and click <strong>Authorize</strong>. Moment will be added to your Zoom account. You can now open it from the <strong>Apps</strong> tab in any Zoom meeting.</p>
+        </div>
+      </div>
+
+      <h3>Install the Companion</h3>
+
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <h3>Download the Companion</h3>
+          <p>Download the Companion app for your platform from the <a href="https://github.com/eduftf/moment/releases/latest" target="_blank" rel="noopener noreferrer">GitHub Releases</a> page:</p>
+          <ul>
+            <li><a href="https://github.com/eduftf/moment/releases/latest/download/moment-companion-macos-arm64" target="_blank" rel="noopener noreferrer">macOS — Apple Silicon (M1–M4)</a></li>
+            <li><a href="https://github.com/eduftf/moment/releases/latest/download/moment-companion-macos-x64" target="_blank" rel="noopener noreferrer">macOS — Intel</a></li>
+            <li><a href="https://github.com/eduftf/moment/releases/latest/download/moment-companion-win-x64.exe" target="_blank" rel="noopener noreferrer">Windows — 64-bit</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">5</span>
+        <div class="step-content">
+          <h3>Run the Companion</h3>
+          <p>Double-click the downloaded file to run it. The Companion starts a local WebSocket server on your machine and waits for capture commands from the Zoom App sidebar.</p>
+          <p>On macOS, you may need to right-click and choose <strong>Open</strong> the first time, then allow it in <strong>System Settings → Privacy & Security</strong>.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Note:</strong> The Companion runs entirely on your local machine. It does not send any data to external servers. Screenshots are saved locally to your computer.
+      </div>
+
+      <div class="step">
+        <span class="step-num">6</span>
+        <div class="step-content">
+          <h3>Verify the connection</h3>
+          <p>Open a Zoom meeting and click the <strong>Apps</strong> button in the meeting toolbar, then select <strong>Moment</strong>. The sidebar will show the connection status — you should see <strong>"Companion: Connected"</strong> in the status bar at the top.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== USAGE ==================== -->
+    <section id="usage">
+      <h2>2. Usage</h2>
+      <p>Moment runs as a sidebar panel inside your Zoom meetings. Once both the Zoom App and Companion are connected, screenshots are captured automatically based on your configured triggers.</p>
+
+      <h3>Opening Moment in a Meeting</h3>
+      <p>During a Zoom meeting, click the <strong>Apps</strong> button in the bottom toolbar, then select <strong>Moment</strong>. The Moment sidebar panel will appear on the right side of your meeting window.</p>
+
+      <h3>Screenshot Triggers</h3>
+      <p>Moment supports three types of screenshot triggers:</p>
+
+      <h3>Reaction Capture</h3>
+      <p>When any participant sends an emoji reaction during the meeting (clap, heart, thumbs up, etc.), Moment automatically captures a screenshot. You can configure which reactions trigger a capture in the sidebar settings. A 5-second cooldown prevents duplicate captures from rapid reactions.</p>
+
+      <h3>Peak Detection</h3>
+      <p>Moment tracks the number of participants in the meeting. When the participant count reaches a new maximum (e.g., going from 8 to 9 participants), a screenshot is automatically captured. This is useful for recording peak attendance. A 2-minute cooldown applies between peak triggers.</p>
+
+      <h3>Manual Capture</h3>
+      <p>Click the <strong>Capture</strong> button in the Moment sidebar at any time to take an instant screenshot. This is always available regardless of trigger settings.</p>
+
+      <h3>Trigger Settings</h3>
+      <p>Use the toggle switches in the sidebar to enable or disable each automatic trigger (Reaction Capture and Peak Detection). You can also select which specific emoji reactions should trigger a capture.</p>
+
+      <h3>Moments List</h3>
+      <p>All captured screenshots appear in the sidebar as a chronological list with thumbnails. Each moment shows the trigger type (reaction, peak, or manual) and timestamp. You can click a thumbnail to preview it or delete unwanted captures.</p>
+
+      <h3>Meeting Archive</h3>
+      <p>Every meeting is automatically archived to a folder on your computer. The default location is <code>~/Moment/{meeting-topic}-{date}/</code>. Each archive contains:</p>
+      <ul>
+        <li><code>archive.html</code> — a self-contained HTML viewer with a timeline of events (participant joins/leaves, reactions, speaker changes) and a screenshot gallery. Open it in any web browser.</li>
+        <li><code>archive.json</code> — raw event data in JSON format for programmatic access.</li>
+        <li><code>images/</code> — folder containing all captured PNG screenshots with descriptive filenames.</li>
+      </ul>
+
+      <h3>Settings</h3>
+      <p>Open the settings panel in the sidebar to configure:</p>
+      <ul>
+        <li><strong>Save location</strong> — change where meeting archives are stored on your computer.</li>
+        <li><strong>Capture mode</strong> — choose between capturing the Zoom window only, the entire screen, or the video area with custom margins.</li>
+        <li><strong>Allowed reactions</strong> — select which emoji reactions should trigger automatic captures.</li>
+      </ul>
+
+      <div class="note">
+        <strong>How it works:</strong> The Moment Zoom App runs inside your meeting as a sidebar panel (iframe). It uses the Zoom Apps SDK to listen for meeting events (reactions, participant changes, speaker changes). When a trigger fires, it sends a capture command over a local WebSocket connection to the Companion app running on your computer. The Companion takes the screenshot using your operating system's native screenshot tool and saves it locally.
+      </div>
+    </section>
+
+    <!-- ==================== REMOVING THE APP ==================== -->
+    <section id="removing">
+      <h2>3. Removing the App</h2>
+
+      <h3>Remove the Zoom App</h3>
+      <ol>
+        <li>Go to <a href="https://marketplace.zoom.us/" target="_blank" rel="noopener noreferrer">marketplace.zoom.us</a> and sign in.</li>
+        <li>Click <strong>Manage</strong> → <strong>Added Apps</strong> (or <strong>Installed Apps</strong>).</li>
+        <li>Find <strong>Moment</strong> in the list.</li>
+        <li>Click <strong>Remove</strong> next to Moment.</li>
+        <li>Confirm the removal.</li>
+      </ol>
+      <p>After removal, Moment will no longer appear in the Apps menu during your Zoom meetings.</p>
+
+      <h3>Remove the Companion</h3>
+      <ul>
+        <li><strong>macOS:</strong> Move the Moment Companion app to the Trash. If you enabled auto-start, remove the launch agent by deleting <code>~/Library/LaunchAgents/space.gtools.moment-companion.plist</code>.</li>
+        <li><strong>Windows:</strong> Delete the <code>moment-companion-win-x64.exe</code> file. If you added it to startup, remove it from your Startup folder.</li>
+      </ul>
+
+      <h3>What happens to your data</h3>
+      <div class="note">
+        <strong>All your data stays on your computer.</strong> Moment does not store any data on external servers. Screenshots, archives, and meeting data are saved locally in your <code>~/Moment/</code> folder (or your configured save location).
+      </div>
+      <p>When you remove the Zoom App and Companion:</p>
+      <ul>
+        <li><strong>Screenshots and archives are preserved.</strong> All previously captured screenshots and meeting archives remain in your local <code>~/Moment/</code> folder. Nothing is deleted.</li>
+        <li><strong>Configuration is preserved.</strong> Your settings file (<code>~/.moment-config.json</code>) remains on your computer. You can delete it manually if you no longer need it.</li>
+        <li><strong>No cloud data to delete.</strong> Moment does not upload any data to the cloud. There are no remote accounts, databases, or stored information to clean up.</li>
+        <li><strong>Zoom permissions are revoked.</strong> Once you remove the Zoom App, Moment no longer has access to any meeting events or data from your Zoom account.</li>
+      </ul>
+      <p>To completely remove all Moment data from your computer, delete the following:</p>
+      <ol>
+        <li><code>~/Moment/</code> — all meeting archives and screenshots</li>
+        <li><code>~/.moment-config.json</code> — configuration file</li>
+        <li>The Companion application file</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <a href="/">Moment</a> &middot; <a href="/support">Support</a> &middot; <a href="/terms">Terms</a> &middot; <a href="/privacy">Privacy</a>
+    <br>&copy; 2026 Moment. All rights reserved.
+  </footer>
+</body>
+</html>

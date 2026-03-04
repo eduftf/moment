@@ -6,7 +6,41 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --cream: #ffffff;
+  /* ─── G-Tools Structural Tokens ─── */
+  --gt-space-xs: 0.25rem;
+  --gt-space-sm: 0.5rem;
+  --gt-space-md: 1rem;
+  --gt-space-lg: 1.5rem;
+  --gt-space-xl: 2.5rem;
+  --gt-space-2xl: 4rem;
+  --gt-space-3xl: 6rem;
+  --gt-radius-sm: 6px;
+  --gt-radius-md: 10px;
+  --gt-radius-lg: 14px;
+  --gt-radius-xl: 20px;
+  --gt-shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --gt-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --gt-shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --gt-shadow-xl: 0 16px 48px rgba(0,0,0,0.16);
+  --gt-ease: 0.2s ease;
+  --gt-ease-spring: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --gt-text-xs: 0.75rem;
+  --gt-text-sm: 0.85rem;
+  --gt-text-base: 1rem;
+  --gt-text-lg: 1.15rem;
+  --gt-text-xl: 1.5rem;
+  --gt-text-2xl: 2rem;
+  --gt-text-3xl: clamp(1.8rem, 4vw, 2.6rem);
+  --gt-text-hero: clamp(2.4rem, 5.5vw, 3.8rem);
+  --gt-weight-normal: 400;
+  --gt-weight-medium: 500;
+  --gt-weight-semibold: 600;
+  --gt-weight-bold: 700;
+  --gt-weight-heavy: 800;
+  --gt-max-w: 1140px;
+
+  /* ─── Moment Palette (brandbook §7) ─── */
+  --cream: #fdfcfa;
   --ink: #0c0c10;
   --accent: #2563eb;
   --text: #1c1c1c;
@@ -15,7 +49,7 @@
   --text-on-dark-dim: rgba(255, 255, 255, 0.45);
   --border: rgba(0, 0, 0, 0.09);
   --border-light: rgba(255, 255, 255, 0.1);
-  --max-w: 1100px;
+  --max-w: var(--gt-max-w);
   --font-d: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-b: "Plus Jakarta Sans", system-ui, sans-serif;
 }
@@ -62,12 +96,12 @@ body::after {
 
 /* --- Shared elements --- */
 .eyebrow {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: var(--gt-text-xs);
+  font-weight: var(--gt-weight-bold);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-bottom: 1rem;
+  margin-bottom: var(--gt-space-md);
 }
 
 
@@ -105,22 +139,22 @@ body::after {
   gap: 2.5rem;
 }
 .nav-links a {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: var(--gt-text-sm);
+  font-weight: var(--gt-weight-semibold);
   letter-spacing: 0.03em;
   color: var(--text-dim);
-  transition: color 0.2s;
+  transition: color var(--gt-ease);
 }
 .nav-links a:hover { color: var(--text); }
 
 .nav-cta {
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: var(--gt-text-sm);
+  font-weight: var(--gt-weight-bold);
   color: #fff;
   background: var(--accent);
   padding: 0.55rem 1.3rem;
-  border-radius: 6px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: var(--gt-radius-sm);
+  transition: transform var(--gt-ease), box-shadow var(--gt-ease);
 }
 .nav-cta:hover {
   transform: translateY(-1px);
@@ -207,8 +241,8 @@ body::after {
 }
 
 .hero-tagline {
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  font-weight: 500;
+  font-size: clamp(var(--gt-text-base), 2vw, var(--gt-text-lg));
+  font-weight: var(--gt-weight-medium);
   color: var(--text-dim);
   line-height: 1.75;
   margin-bottom: 2.75rem;
@@ -226,15 +260,15 @@ body::after {
   display: inline-flex;
   align-items: center;
   padding: 0.85rem 2.1rem;
-  border-radius: 8px;
+  border-radius: var(--gt-radius-md);
   background: var(--accent);
   color: #fff;
   font-family: var(--font-b);
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: var(--gt-text-sm);
+  font-weight: var(--gt-weight-bold);
   border: none;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--gt-ease), box-shadow var(--gt-ease);
 }
 .btn-fill:hover {
   transform: translateY(-2px);
@@ -245,15 +279,15 @@ body::after {
   display: inline-flex;
   align-items: center;
   padding: 0.85rem 2.1rem;
-  border-radius: 8px;
+  border-radius: var(--gt-radius-md);
   background: transparent;
   color: var(--text);
   font-family: var(--font-b);
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: var(--gt-text-sm);
+  font-weight: var(--gt-weight-bold);
   border: 1.5px solid rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: transform var(--gt-ease), border-color var(--gt-ease);
 }
 .btn-outline:hover {
   transform: translateY(-2px);
@@ -267,8 +301,8 @@ body::after {
   flex-wrap: wrap;
 }
 .hero-pills span {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: var(--gt-text-xs);
+  font-weight: var(--gt-weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-dim);
@@ -330,8 +364,8 @@ body::after {
 }
 .how h2 {
   font-family: var(--font-d);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  font-weight: 800;
+  font-size: var(--gt-text-3xl);
+  font-weight: var(--gt-weight-heavy);
   letter-spacing: -0.03em;
   line-height: 1.15;
   margin-bottom: 3.5rem;
@@ -368,21 +402,21 @@ body::after {
 .frame-num {
   display: block;
   font-family: "Courier New", Courier, monospace;
-  font-size: 0.68rem;
+  font-size: var(--gt-text-xs);
   letter-spacing: 0.12em;
   color: var(--accent);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--gt-space-lg);
 }
 
 .frame h3 {
   font-family: var(--font-d);
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: var(--gt-text-lg);
+  font-weight: var(--gt-weight-bold);
   margin-bottom: 0.65rem;
 }
 
 .frame p {
-  font-size: 0.88rem;
+  font-size: var(--gt-text-sm);
   line-height: 1.7;
   color: var(--text-on-dark-dim);
 }
@@ -400,8 +434,8 @@ body::after {
 }
 .features h2 {
   font-family: var(--font-d);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  font-weight: 800;
+  font-size: var(--gt-text-3xl);
+  font-weight: var(--gt-weight-heavy);
   letter-spacing: -0.03em;
   line-height: 1.15;
   margin-bottom: 3.5rem;
@@ -438,14 +472,14 @@ body::after {
 
 .feature h3 {
   font-family: var(--font-d);
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: var(--gt-text-lg);
+  font-weight: var(--gt-weight-bold);
   margin-bottom: 0.35rem;
   color: var(--text);
 }
 
 .feature > div > p {
-  font-size: 0.9rem;
+  font-size: var(--gt-text-base);
   color: var(--text-dim);
   line-height: 1.7;
   max-width: 500px;
@@ -467,13 +501,13 @@ body::after {
 }
 .download h2 {
   font-family: var(--font-d);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  font-weight: 800;
+  font-size: var(--gt-text-3xl);
+  font-weight: var(--gt-weight-heavy);
   letter-spacing: -0.03em;
   margin-bottom: 1rem;
 }
 .download-sub {
-  font-size: 0.92rem;
+  font-size: var(--gt-text-base);
   color: var(--text-on-dark-dim);
   line-height: 1.75;
   margin-bottom: 3rem;
@@ -493,9 +527,9 @@ body::after {
   gap: 0.5rem;
   padding: 2.25rem 2.75rem;
   border: 1px solid var(--border-light);
-  border-radius: 12px;
+  border-radius: var(--gt-radius-lg);
   min-width: 180px;
-  transition: border-color 0.25s, transform 0.25s;
+  transition: border-color var(--gt-ease), transform var(--gt-ease);
 }
 .platform:hover {
   border-color: var(--accent);
@@ -504,11 +538,11 @@ body::after {
 
 .platform-name {
   font-family: var(--font-d);
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: var(--gt-text-lg);
+  font-weight: var(--gt-weight-bold);
 }
 .platform-detail {
-  font-size: 0.73rem;
+  font-size: var(--gt-text-xs);
   color: var(--text-on-dark-dim);
   letter-spacing: 0.02em;
 }
@@ -542,9 +576,9 @@ body::after {
   margin-bottom: 2.25rem;
 }
 .btn-lg {
-  font-size: 1rem;
+  font-size: var(--gt-text-base);
   padding: 1.05rem 3rem;
-  border-radius: 10px;
+  border-radius: var(--gt-radius-md);
 }
 
 
@@ -573,17 +607,34 @@ body::after {
   gap: 2rem;
 }
 .footer-links a {
-  font-size: 0.8rem;
+  font-size: var(--gt-text-sm);
   color: var(--text-dim);
-  transition: color 0.2s;
+  transition: color var(--gt-ease);
 }
 .footer-links a:hover { color: var(--accent); }
 
 .footer-copy {
-  font-size: 0.75rem;
+  font-size: var(--gt-text-xs);
   color: var(--text-dim);
   opacity: 0.5;
 }
+
+/* ─── G-Tools Ecosystem Badge ─── */
+.gt-badge {
+  text-align: center;
+  padding: var(--gt-space-lg) 0 var(--gt-space-md);
+  font-size: var(--gt-text-xs);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  opacity: 0.35;
+  border-top: 1px solid var(--border);
+}
+.gt-badge a {
+  color: inherit;
+  text-decoration: none;
+}
+.gt-badge a:hover { opacity: 0.7; }
 
 
 /* ============================================================

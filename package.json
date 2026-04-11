@@ -1,6 +1,15 @@
 {
-  "name": "moment",
-  "private": true,
+  "name": "moment-capture",
+  "description": "Open-source meeting screenshot tool — capture moments triggered by reactions, participant peaks, or manual click",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "GTools <contact@gtools.space> (https://gtools.space)",
+  "homepage": "https://moment.gtools.space",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eduftf/moment"
+  },
+  "keywords": ["zoom", "meeting", "screenshot", "capture", "reactions", "archive"],
   "workspaces": ["app", "companion"],
   "scripts": {
     "build": "npm run build --workspaces",
@@ -9,5 +18,10 @@
     "test:watch": "npm run test --workspaces",
     "typecheck": "tsc -b app companion",
     "lint": "npm run lint --workspace=app"
+  },
+  "overrides": {
+    "picomatch": "^4.0.4",
+    "flatted": "^3.4.2",
+    "undici": "^7.24.0"
   }
 }

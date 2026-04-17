@@ -2,6 +2,7 @@ use std::sync::Arc;
 use crate::platform::CaptureBackend;
 
 pub mod platform;
+pub mod storage;
 pub mod commands;
 
 pub struct AppHandles {

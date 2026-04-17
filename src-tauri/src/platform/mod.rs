@@ -50,6 +50,9 @@ pub trait CaptureBackend: Send + Sync {
     async fn screen_recording_granted(&self) -> bool;
 }
 
+#[cfg(target_os = "macos")]
+pub mod macos;
+
 #[cfg(test)]
 mod tests {
     use super::*;

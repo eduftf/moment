@@ -107,12 +107,16 @@ impl CaptureBackend for MacosCapture {
                 stream
                     .start_capture()
                     .map_err(|e| PlatformError::Backend(e.to_string()))?;
-                let sample = rx
+                let recv_result = rx
                     .recv_timeout(std::time::Duration::from_secs(5))
-                    .map_err(|_| PlatformError::Backend("no frame received within 5s".into()))?;
-                stream
+                    .map_err(|_| PlatformError::Backend("no frame received within 5s".into()));
+                // Always stop the stream, regardless of recv outcome
+                let stop_result = stream
                     .stop_capture()
-                    .map_err(|e| PlatformError::Backend(e.to_string()))?;
+                    .map_err(|e| PlatformError::Backend(e.to_string()));
+                // Propagate recv error first (proximate cause of failure)
+                let sample = recv_result?;
+                stop_result?;
 
                 let pixel_buf = sample
                     .get_pixel_buffer()

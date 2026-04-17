@@ -5,6 +5,7 @@ dist/
 SECRETS.local.md
 .DS_Store
 .claude/
+tsconfig.tsbuildinfo
 
 # Tauri / Rust
 src-tauri/target/

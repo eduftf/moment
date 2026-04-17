@@ -15,7 +15,7 @@
     "tauri": "tauri",
     "typecheck": "tsc -b",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.1.0",

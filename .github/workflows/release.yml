@@ -2,7 +2,7 @@ name: Release Companion Binary
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v-parked-*"]
 
 permissions:
   contents: write

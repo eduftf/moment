@@ -5,3 +5,7 @@ dist/
 SECRETS.local.md
 .DS_Store
 .claude/
+
+# Tauri / Rust
+src-tauri/target/
+src-tauri/gen/schemas/

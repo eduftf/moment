@@ -1,3 +1,5 @@
+pub mod platform;
+
 use tauri::Manager;
 use tracing_subscriber::EnvFilter;
 

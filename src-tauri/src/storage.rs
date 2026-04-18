@@ -106,6 +106,7 @@ impl Storage {
         Ok(())
     }
 
+    // TODO M2: add file mutex or atomic append when multiple triggers may run concurrently.
     pub fn append_screenshot(
         &self,
         dir: &Path,

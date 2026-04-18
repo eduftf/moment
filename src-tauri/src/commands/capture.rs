@@ -21,7 +21,7 @@ pub async fn capture_manual(state: State<'_, AppHandles>) -> Result<String, Stri
 
     let file = frame.png_path
         .strip_prefix(&meeting_path)
-        .unwrap_or(&frame.png_path)
+        .map_err(|_| "capture wrote outside meeting dir".to_string())?
         .display()
         .to_string();
 

@@ -1,12 +1,15 @@
 use std::sync::Arc;
 use crate::platform::CaptureBackend;
 
-pub mod platform;
-pub mod storage;
 pub mod commands;
+pub mod platform;
+pub mod session;
+pub mod storage;
 
 pub struct AppHandles {
     pub capture: Arc<dyn CaptureBackend>,
+    pub storage: Arc<storage::Storage>,
+    pub session: tokio::sync::Mutex<session::SessionState>,
 }
 
 fn build_capture() -> Arc<dyn CaptureBackend> {
@@ -23,7 +26,11 @@ pub fn run() {
             .unwrap_or_else(|_| "info,moment=debug".into()))
         .init();
 
-    let handles = AppHandles { capture: build_capture() };
+    let handles = AppHandles {
+        capture: build_capture(),
+        storage: Arc::new(storage::Storage::default()),
+        session: tokio::sync::Mutex::new(session::SessionState::idle()),
+    };
 
     commands::register(
         tauri::Builder::default()

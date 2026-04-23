@@ -33,5 +33,7 @@ export const tauri = {
   grantedPermissions: () => invoke<{ screen: boolean }>("granted_permissions"),
   openScreenRecordingPrefs: () => invoke<void>("open_screen_recording_prefs"),
   getRecentMeetings: (limit: number = 1) =>
-    invoke<MeetingRow[]>("get_recent_meetings", { limit })
+    invoke<MeetingRow[]>("get_recent_meetings", { limit }),
+  toggleSession: (windowId?: number, title?: string | null) =>
+    invoke<SessionState>("toggle_session", { windowId, title: title ?? null })
 };

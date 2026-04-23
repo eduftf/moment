@@ -120,3 +120,22 @@ pub async fn get_recent_meetings(
         .recent(limit)
         .map_err(|e| format!("index recent: {e}"))
 }
+
+#[tauri::command]
+pub async fn toggle_session(
+    handles: State<'_, AppHandles>,
+    window_id: Option<WindowId>,
+    title: Option<String>,
+) -> Result<SessionState, String> {
+    let is_recording = {
+        let guard = handles.session.lock().await;
+        guard.is_recording()
+    };
+
+    if is_recording {
+        stop_session(handles).await
+    } else {
+        let wid = window_id.ok_or_else(|| "window_id required when starting".to_string())?;
+        start_session(handles, wid, title).await
+    }
+}

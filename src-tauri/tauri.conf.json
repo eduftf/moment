@@ -19,16 +19,23 @@
         "visible": false,
         "center": true,
         "decorations": true
+      },
+      {
+        "label": "popover",
+        "title": "Moment",
+        "url": "index.html",
+        "width": 320,
+        "height": 220,
+        "visible": false,
+        "decorations": false,
+        "resizable": false,
+        "transparent": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true
       }
     ],
     "macOSPrivateApi": true,
-    "security": { "csp": "default-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'" },
-    "trayIcon": {
-      "id": "moment-tray",
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true,
-      "menuOnLeftClick": true
-    }
+    "security": { "csp": "default-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'" }
   },
   "bundle": {
     "active": true,

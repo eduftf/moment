@@ -49,8 +49,8 @@ Manual smoke: `docs/user/SMOKE.md`.
 
 | Milestone | Scope | Status |
 |---|---|---|
-| **M1** | Capture Foundation — tray + hotkeys + manual capture + SQLite index | 🚧 closing |
-| M2 | Peak detection via Swift sidecar + Vision framework | ⏳ |
+| **M1** | Capture Foundation — tray + hotkeys + manual capture + SQLite index | ✅ |
+| **M2** | Peak detection via Swift sidecar + Vision framework | 🚧 in progress |
 | M3 | Audio capture + on-device transcript (SFSpeechRecognizer) | ⏳ |
 | M4 | AI summary + action items (Foundation Models) | ⏳ |
 | M5 | Interactive dashboard (gallery + transcript + summary + notes) | ⏳ |

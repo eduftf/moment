@@ -56,6 +56,20 @@ pub async fn start_session(
         path: meeting_path.display().to_string(),
     };
 
+    // Update the meetings index. Failures are non-fatal: the meeting folder
+    // on disk is the source of truth, the SQLite index is only a cache for
+    // fast listing. Warn and continue so the session stays recording.
+    if let SessionState::Recording { meeting_id, started_at, title, path, .. } = &*guard {
+        if let Err(e) = state.index.insert_started(
+            *meeting_id,
+            title,
+            path,
+            *started_at,
+        ) {
+            tracing::warn!("index insert_started failed: {e} — meeting folder is still source of truth");
+        }
+    }
+
     Ok(guard.clone())
 }
 
@@ -79,6 +93,15 @@ pub async fn stop_session(state: State<'_, AppHandles>) -> Result<SessionState, 
             .map_err(|e| e.to_string())?;
     }
     *guard = SessionState::Done { meeting_id };
+
+    // Update the meetings index. Non-fatal: meeting.json on disk already has
+    // ended_at set; the SQLite row is only for fast listing.
+    if let SessionState::Done { meeting_id, .. } = &*guard {
+        if let Err(e) = state.index.mark_ended(*meeting_id, Utc::now()) {
+            tracing::warn!("index mark_ended failed: {e}");
+        }
+    }
+
     Ok(guard.clone())
 }
 

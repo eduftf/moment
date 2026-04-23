@@ -148,3 +148,29 @@ mod tests {
         assert!(json.get("endedAt").is_some());
     }
 }
+
+#[cfg(test)]
+mod lifecycle_integration {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn full_lifecycle_round_trip() {
+        let dir = tempdir().unwrap();
+        let idx = Index::open(dir.path().join("m.sqlite")).unwrap();
+        let id = Ulid::new();
+        let t0 = Utc::now();
+        idx.insert_started(id, "Call", "/tmp/call", t0).unwrap();
+
+        let rows = idx.recent(10).unwrap();
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0].title, "Call");
+        assert!(rows[0].ended_at.is_none());
+
+        let t1 = t0 + chrono::Duration::seconds(60);
+        idx.mark_ended(id, t1).unwrap();
+
+        let rows = idx.recent(10).unwrap();
+        assert!(rows[0].ended_at.is_some());
+    }
+}

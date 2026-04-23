@@ -14,6 +14,15 @@ export type SessionState =
   | { kind: "finalizing"; meetingId: string }
   | { kind: "done"; meetingId: string };
 
+export type MeetingRow = {
+  id: string;
+  title: string;
+  path: string;
+  startedAt: string;
+  endedAt: string | null;
+  peak: number;
+};
+
 export const tauri = {
   getWindows: () => invoke<WindowInfo[]>("get_windows"),
   startSession: (windowId: number, title: string | null) =>
@@ -22,5 +31,7 @@ export const tauri = {
   sessionState: () => invoke<SessionState>("session_state"),
   captureManual: () => invoke<string>("capture_manual"),
   grantedPermissions: () => invoke<{ screen: boolean }>("granted_permissions"),
-  openScreenRecordingPrefs: () => invoke<void>("open_screen_recording_prefs")
+  openScreenRecordingPrefs: () => invoke<void>("open_screen_recording_prefs"),
+  getRecentMeetings: (limit: number = 1) =>
+    invoke<MeetingRow[]>("get_recent_meetings", { limit })
 };

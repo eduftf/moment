@@ -109,3 +109,14 @@ pub async fn stop_session(state: State<'_, AppHandles>) -> Result<SessionState, 
 pub async fn session_state(state: State<'_, AppHandles>) -> Result<SessionState, String> {
     Ok(state.session.lock().await.clone())
 }
+
+#[tauri::command]
+pub async fn get_recent_meetings(
+    handles: tauri::State<'_, crate::AppHandles>,
+    limit: u32,
+) -> Result<Vec<crate::index_db::MeetingRow>, String> {
+    handles
+        .index
+        .recent(limit)
+        .map_err(|e| format!("index recent: {e}"))
+}

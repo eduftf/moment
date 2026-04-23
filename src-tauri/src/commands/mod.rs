@@ -13,5 +13,6 @@ pub fn register<R: Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
         session::start_session,
         session::stop_session,
         session::session_state,
+        session::get_recent_meetings,
     ])
 }

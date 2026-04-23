@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-toggle-session"
+description = "Enables the toggle_session command without any pre-configured scope."
+commands.allow = ["toggle_session"]
+
+[[permission]]
+identifier = "deny-toggle-session"
+description = "Denies the toggle_session command without any pre-configured scope."
+commands.deny = ["toggle_session"]

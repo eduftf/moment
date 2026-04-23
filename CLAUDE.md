@@ -59,13 +59,15 @@ cd src-tauri && cargo test  # Rust tests (session, storage, platform, index_db)
 ## Milestone Status
 | Milestone | Scope | Status |
 |---|---|---|
-| M1 | Capture foundation — window picker + manual capture + SQLite index + hotkeys + tray | **🚧 in progress** — see `docs/superpowers/plans/2026-04-23-moment-m1-closeout.md` |
-| M2 | Peak detection via Swift sidecar + Vision framework | ⏳ |
-| M3 | Audio + on-device transcript (SFSpeechRecognizer) | ⏳ |
-| M4 | AI summary + action items (Foundation Models) | ⏳ |
+| M1 | Capture foundation — window picker + manual capture + SQLite index + hotkeys + tray | **✅ automated gates passed; live smoke gated on user** |
+| M2 | Peak detection via Swift sidecar + Vision framework | **✅ infrastructure landed; 4-person Zoom smoke gated on user** |
+| M3 | Audio + on-device transcript (SFSpeechRecognizer) | ⏳ research committed (`docs/superpowers/research/2026-04-24-m3-transcript-research.md`), spec next |
+| M4 | AI summary + action items (Foundation Models) | ⏳ research committed (`docs/superpowers/research/2026-04-24-m4-ai-summary-research.md`), spec next |
 | M5 | Interactive dashboard (gallery + transcript + summary + notes) | ⏳ |
 | M6 | Ad-hoc signed DMG, GitHub Releases, landing refresh | ⏳ |
 | M7 | Platform abstraction polish, community onboarding | ⏳ |
+
+See `NEXT-STEPS.md` at the repo root for the canonical "what's next" list, including user-gated items (live smoke, face fixtures, push decision).
 
 ## Key Patterns
 - **Meeting folder is source of truth.** SQLite is a cache for fast listing — a missing row must not prevent a meeting from opening on disk.

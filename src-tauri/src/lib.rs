@@ -5,6 +5,7 @@ pub mod commands;
 pub mod index_db;
 pub mod platform;
 pub mod session;
+pub mod sidecar;
 pub mod storage;
 pub mod tray;
 

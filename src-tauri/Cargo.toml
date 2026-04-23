@@ -27,6 +27,8 @@ chrono = { version = "0.4", features = ["serde"] }
 ulid = { version = "1", features = ["serde"] }
 rusqlite = { version = "0.32", features = ["bundled"] }
 directories = "5"
+dashmap = "6"
+exponential-backoff = "2"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 screencapturekit = "0.3"

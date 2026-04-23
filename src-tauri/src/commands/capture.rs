@@ -1,12 +1,16 @@
 use chrono::Utc;
 use tauri::State;
+use tauri_plugin_notification::NotificationExt;
 
 use crate::session::SessionState;
 use crate::storage::ScreenshotEntry;
 use crate::AppHandles;
 
 #[tauri::command]
-pub async fn capture_manual(state: State<'_, AppHandles>) -> Result<String, String> {
+pub async fn capture_manual<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+    state: State<'_, AppHandles>,
+) -> Result<String, String> {
     // Snapshot the session state under lock, then release before the slow capture_window call.
     // Capturing while holding the lock would block session_state() / stop_session() for 1-5s.
     let snapshot = state.session.lock().await.clone();
@@ -29,6 +33,15 @@ pub async fn capture_manual(state: State<'_, AppHandles>) -> Result<String, Stri
         &meeting_path,
         ScreenshotEntry { file: file.clone(), trigger: "manual".into(), at: Utc::now() },
     ).map_err(|e| e.to_string())?;
+
+    // Fire a success toast. Non-fatal: a missing Notification permission
+    // just means the user sees no toast — the screenshot is already on disk.
+    let _ = app
+        .notification()
+        .builder()
+        .title("Moment")
+        .body(format!("Captured {file}"))
+        .show();
 
     Ok(file)
 }

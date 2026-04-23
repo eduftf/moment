@@ -1,0 +1,31 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Core permissions required by the Moment main window and tray popover.",
+  "windows": ["main", "popover"],
+  "permissions": [
+    "core:default",
+    "core:app:default",
+    "core:event:default",
+    "core:window:default",
+    "core:webview:default",
+    "core:tray:default",
+    "core:path:default",
+    "core:menu:default",
+    "core:image:default",
+    "global-shortcut:default",
+    "notification:default",
+    "notification:allow-notify",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "allow-get-windows",
+    "allow-granted-permissions",
+    "allow-open-screen-recording-prefs",
+    "allow-start-session",
+    "allow-stop-session",
+    "allow-session-state",
+    "allow-capture-manual",
+    "allow-toggle-session",
+    "allow-get-recent-meetings"
+  ]
+}

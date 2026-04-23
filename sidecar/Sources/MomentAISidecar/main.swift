@@ -18,6 +18,18 @@ func handle(_ request: Request) -> Response {
     switch request.op {
     case "availability":
         return .success(id: request.id, result: AnyEncodable(value: Availability.probe()))
+    case "count_faces":
+        guard let path = request.args?["image_path"]?.value as? String else {
+            return .failure(id: request.id, code: "image_not_found", message: "args.image_path missing")
+        }
+        do {
+            let result = try VisionOps.countFaces(imagePath: path)
+            return .success(id: request.id, result: AnyEncodable(value: result))
+        } catch let e as VisionOpError {
+            return .failure(id: request.id, code: e.code, message: e.message)
+        } catch {
+            return .failure(id: request.id, code: "vision_failed", message: error.localizedDescription)
+        }
     default:
         return .failure(id: request.id, code: "unsupported_op", message: "op \"\(request.op)\" not recognized")
     }

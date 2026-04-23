@@ -63,6 +63,14 @@ impl Index {
         Ok(())
     }
 
+    pub fn update_peak(&self, id: Ulid, peak: i64) -> IndexResult<()> {
+        self.conn.lock().unwrap().execute(
+            "UPDATE meetings SET peak = ?1 WHERE id = ?2",
+            params![peak, id.to_string()],
+        )?;
+        Ok(())
+    }
+
     pub fn recent(&self, limit: u32) -> IndexResult<Vec<MeetingRow>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
@@ -132,6 +140,17 @@ mod tests {
         let rows = idx.recent(10).unwrap();
         assert_eq!(rows[0].title, "Late");
         assert_eq!(rows[1].title, "Early");
+    }
+
+    #[test]
+    fn update_peak_roundtrip() {
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        let idx = Index::open(tmp.path().to_path_buf()).unwrap();
+        let id = Ulid::new();
+        idx.insert_started(id, "Demo", "/tmp/x", Utc::now()).unwrap();
+        idx.update_peak(id, 5).unwrap();
+        let rows = idx.recent(1).unwrap();
+        assert_eq!(rows[0].peak, 5);
     }
 
     #[test]

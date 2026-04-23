@@ -11,6 +11,19 @@ const COMMANDS: &[&str] = &[
 ];
 
 fn main() {
+    // Build the Swift sidecar before tauri_build runs, so bundle.externalBin
+    // finds the binary. Re-run when sidecar sources change.
+    println!("cargo:rerun-if-changed=../sidecar/Package.swift");
+    println!("cargo:rerun-if-changed=../sidecar/Sources");
+    println!("cargo:rerun-if-changed=../scripts/build-sidecar.sh");
+
+    let status = std::process::Command::new("../scripts/build-sidecar.sh")
+        .status()
+        .expect("failed to spawn scripts/build-sidecar.sh");
+    if !status.success() {
+        panic!("scripts/build-sidecar.sh exited with status {status}");
+    }
+
     tauri_build::try_build(
         tauri_build::Attributes::new()
             .app_manifest(tauri_build::AppManifest::new().commands(COMMANDS)),

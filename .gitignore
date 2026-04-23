@@ -16,3 +16,6 @@ src-tauri/gen/schemas/
 sidecar/.build/
 sidecar/.swiftpm/
 sidecar/Package.resolved
+
+# Swift sidecar build outputs (rebuilt via build.rs)
+src-tauri/binaries/

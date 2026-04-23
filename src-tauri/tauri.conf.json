@@ -42,6 +42,7 @@
     "targets": ["dmg"],
     "icon": ["icons/icon.icns"],
     "category": "Productivity",
+    "externalBin": ["binaries/moment-ai-sidecar"],
     "macOS": {
       "minimumSystemVersion": "12.3",
       "entitlements": null,

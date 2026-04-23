@@ -1,9 +1,11 @@
 use chrono::Utc;
 use tauri::State;
+use tauri_plugin_notification::NotificationExt;
 use ulid::Ulid;
 
 use crate::platform::WindowId;
 use crate::session::SessionState;
+use crate::storage::MeetingMetadata;
 use crate::AppHandles;
 
 #[tauri::command]
@@ -74,7 +76,10 @@ pub async fn start_session(
 }
 
 #[tauri::command]
-pub async fn stop_session(state: State<'_, AppHandles>) -> Result<SessionState, String> {
+pub async fn stop_session<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+    state: State<'_, AppHandles>,
+) -> Result<SessionState, String> {
     let mut guard = state.session.lock().await;
 
     // Fix 3: guard against re-entrant calls on Done/Finalizing sessions.
@@ -86,12 +91,17 @@ pub async fn stop_session(state: State<'_, AppHandles>) -> Result<SessionState, 
     // Safe to unwrap: is_recording() implies meeting_id is Some.
     let meeting_id = guard.meeting_id().expect("is_recording implies meeting_id");
 
-    if let SessionState::Recording { path, .. } = guard.clone() {
+    // Capture the meeting path from the Recording state BEFORE transitioning.
+    // We'll use it to read the finalized meeting.json for the screenshot count.
+    let meeting_path = if let SessionState::Recording { path, .. } = guard.clone() {
         state
             .storage
             .finalize_meeting_json(std::path::Path::new(&path), Utc::now())
             .map_err(|e| e.to_string())?;
-    }
+        Some(path)
+    } else {
+        None
+    };
     *guard = SessionState::Done { meeting_id };
 
     // Update the meetings index. Non-fatal: meeting.json on disk already has
@@ -100,6 +110,23 @@ pub async fn stop_session(state: State<'_, AppHandles>) -> Result<SessionState, 
         if let Err(e) = state.index.mark_ended(*meeting_id, Utc::now()) {
             tracing::warn!("index mark_ended failed: {e}");
         }
+    }
+
+    // Fire a "Meeting saved" toast. meeting.json is the source of truth for
+    // the screenshot count — read directly from the path we just finalized.
+    // A read failure falls back to 0 rather than blocking the return.
+    if let Some(path) = meeting_path {
+        let count = std::fs::read_to_string(std::path::Path::new(&path).join("meeting.json"))
+            .ok()
+            .and_then(|s| serde_json::from_str::<MeetingMetadata>(&s).ok())
+            .map(|m| m.screenshots.len())
+            .unwrap_or(0);
+        let _ = app
+            .notification()
+            .builder()
+            .title("Moment")
+            .body(format!("Meeting saved — {count} screenshots"))
+            .show();
     }
 
     Ok(guard.clone())
@@ -122,7 +149,8 @@ pub async fn get_recent_meetings(
 }
 
 #[tauri::command]
-pub async fn toggle_session(
+pub async fn toggle_session<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
     handles: State<'_, AppHandles>,
     window_id: Option<WindowId>,
     title: Option<String>,
@@ -133,7 +161,7 @@ pub async fn toggle_session(
     };
 
     if is_recording {
-        stop_session(handles).await
+        stop_session(app, handles).await
     } else {
         let wid = window_id.ok_or_else(|| "window_id required when starting".to_string())?;
         start_session(handles, wid, title).await

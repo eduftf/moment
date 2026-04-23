@@ -10,3 +10,9 @@ tsconfig.tsbuildinfo
 # Tauri / Rust
 src-tauri/target/
 src-tauri/gen/schemas/
+.claude/brief.md
+
+# Swift sidecar
+sidecar/.build/
+sidecar/.swiftpm/
+sidecar/Package.resolved

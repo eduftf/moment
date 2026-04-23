@@ -50,6 +50,18 @@ pub trait CaptureBackend: Send + Sync {
     async fn screen_recording_granted(&self) -> bool;
 }
 
+#[derive(Debug, Clone)]
+pub enum VisionAvailability {
+    Available,
+    Unavailable { reason: String },
+}
+
+#[async_trait]
+pub trait VisionBackend: Send + Sync {
+    async fn count_faces(&self, frame_path: &std::path::Path) -> PlatformResult<usize>;
+    async fn availability(&self) -> VisionAvailability;
+}
+
 #[cfg(target_os = "macos")]
 pub mod macos;
 

@@ -16,10 +16,8 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run lint
+      - run: npm run typecheck
 
-      - run: npm test
+      - run: npm run test:run
 
-      - run: npm run build --workspace=app
-
-      - run: npm run build --workspace=companion
+      - run: npm run build

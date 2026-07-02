@@ -47,6 +47,12 @@ pub struct Event {
 
 pub struct Storage {
     pub root: PathBuf,
+    /// Serializes the read-modify-write of `meeting.json` so concurrent writers
+    /// (e.g. a manual capture and a peak-detection promotion firing at once)
+    /// cannot clobber each other's appends. Mirrors the `Connection` mutex in
+    /// `index_db.rs`. Guards the file contents, not the `PathBuf`, so it holds
+    /// `()`; the lock scope covers the whole read/deserialize/push/write.
+    meta_lock: std::sync::Mutex<()>,
 }
 
 impl Default for Storage {
@@ -54,12 +60,12 @@ impl Default for Storage {
         let home = directories::BaseDirs::new()
             .map(|b| b.home_dir().to_path_buf())
             .unwrap_or_else(|| PathBuf::from("."));
-        Self { root: home.join("Moment") }
+        Self { root: home.join("Moment"), meta_lock: std::sync::Mutex::new(()) }
     }
 }
 
 impl Storage {
-    pub fn new(root: PathBuf) -> Self { Self { root } }
+    pub fn new(root: PathBuf) -> Self { Self { root, meta_lock: std::sync::Mutex::new(()) } }
 
     pub fn create_meeting_dir(&self, title: &str, started_at: DateTime<Utc>) -> StorageResult<PathBuf> {
         let safe = sanitize_title(title);
@@ -97,6 +103,9 @@ impl Storage {
     }
 
     pub fn finalize_meeting_json(&self, dir: &Path, ended_at: DateTime<Utc>) -> StorageResult<()> {
+        // Same file as `append_screenshot`; share the lock so a late screenshot
+        // append cannot race with finalize and drop either write.
+        let _guard = self.meta_lock.lock().unwrap();
         let path = dir.join("meeting.json");
         let bytes = std::fs::read(&path)?;
         let mut m: MeetingMetadata = serde_json::from_slice(&bytes)?;
@@ -106,12 +115,15 @@ impl Storage {
         Ok(())
     }
 
-    // TODO M2: add file mutex or atomic append when multiple triggers may run concurrently.
     pub fn append_screenshot(
         &self,
         dir: &Path,
         entry: ScreenshotEntry,
     ) -> StorageResult<()> {
+        // Serialize the whole read-modify-write. Without this, two concurrent
+        // callers can both read the same base state and the second write wins,
+        // silently dropping the first caller's screenshot + event.
+        let _guard = self.meta_lock.lock().unwrap();
         let path = dir.join("meeting.json");
         let bytes = std::fs::read(&path)?;
         let mut m: MeetingMetadata = serde_json::from_slice(&bytes)?;
@@ -166,5 +178,54 @@ mod tests {
     #[test]
     fn sanitize_title_drops_slashes() {
         assert_eq!(sanitize_title("a/b:c"), "a_b_c");
+    }
+
+    #[test]
+    fn concurrent_append_screenshot_records_every_entry() {
+        use std::sync::Arc;
+        use std::thread;
+
+        const N: usize = 32;
+
+        let tmp = tempdir().unwrap();
+        let s = Arc::new(Storage::new(tmp.path().to_path_buf()));
+        let now = Utc::now();
+        let dir = s.create_meeting_dir("Concurrent", now).unwrap();
+        s.write_meeting_json(&dir, Ulid::new(), "Concurrent", 1, now).unwrap();
+
+        let handles: Vec<_> = (0..N)
+            .map(|i| {
+                let s = Arc::clone(&s);
+                let dir = dir.clone();
+                thread::spawn(move || {
+                    s.append_screenshot(
+                        &dir,
+                        ScreenshotEntry {
+                            file: format!("shot-{i}.png"),
+                            trigger: "peak".into(),
+                            at: Utc::now(),
+                        },
+                    )
+                    .unwrap();
+                })
+            })
+            .collect();
+        for h in handles {
+            h.join().unwrap();
+        }
+
+        let m: MeetingMetadata =
+            serde_json::from_slice(&std::fs::read(dir.join("meeting.json")).unwrap()).unwrap();
+
+        // No lost updates: exactly N screenshots, and the initial "start" event
+        // plus one "manual_capture" event per append.
+        assert_eq!(m.screenshots.len(), N, "every concurrent append must survive");
+        assert_eq!(m.events.len(), N + 1, "start event + one per append");
+
+        // Each thread wrote a distinct filename; all must be present.
+        let mut files: Vec<_> = m.screenshots.iter().map(|e| e.file.clone()).collect();
+        files.sort();
+        files.dedup();
+        assert_eq!(files.len(), N, "no screenshot filename was clobbered");
     }
 }

@@ -58,7 +58,7 @@
 
 ## Pre-flight
 
-Before Task 1, confirm from `~/Local/moment/`:
+Before Task 1, confirm from `~/GFiles/Local/moment/`:
 
 ```bash
 git status --short                           # expect M1 session's drift only
@@ -580,7 +580,7 @@ sidecar/.build/
 
 - [ ] **Step 5: Verify build chain**
 
-Run: `cd /Users/mykhailog/Local/moment && cargo check --manifest-path src-tauri/Cargo.toml 2>&1 | tail -10`
+Run: `cd /Users/grk/GFiles/Local/moment && cargo check --manifest-path src-tauri/Cargo.toml 2>&1 | tail -10`
 Expected: `cargo:rerun-if-changed=...` lines visible, Swift build runs, cargo check finishes clean.
 
 Confirm binary present:
@@ -797,10 +797,10 @@ Add `pub mod sidecar;` alongside the existing module declarations.
 
 - [ ] **Step 7: Compile**
 
-Run: `cd /Users/mykhailog/Local/moment && cd src-tauri && cargo check 2>&1 | tail -10`
+Run: `cd /Users/grk/GFiles/Local/moment && cd src-tauri && cargo check 2>&1 | tail -10`
 Expected: clean compile.
 
-Run: `cd /Users/mykhailog/Local/moment && cd src-tauri && cargo test --lib 2>&1 | tail -10`
+Run: `cd /Users/grk/GFiles/Local/moment && cd src-tauri && cargo test --lib 2>&1 | tail -10`
 Expected: still 16 green (no new tests yet).
 
 - [ ] **Step 8: Commit**
@@ -1152,7 +1152,7 @@ Add `use std::os::unix::fs::PermissionsExt;` at the top of the test module's imp
 
 - [ ] **Step 3: Run tests**
 
-Run: `cd /Users/mykhailog/Local/moment && cd src-tauri && cargo test --lib sidecar:: 2>&1 | tail -20`
+Run: `cd /Users/grk/GFiles/Local/moment && cd src-tauri && cargo test --lib sidecar:: 2>&1 | tail -20`
 Expected: both new tests pass on macOS (they rely on `sh` being present — which it always is on macOS).
 
 - [ ] **Step 4: Commit**
@@ -1186,7 +1186,7 @@ EOF
 
 - [ ] **Step 1: Inspect current `platform/mod.rs`**
 
-Run: `grep -n "VisionBackend\|VisionAvailability\|pub trait" /Users/mykhailog/Local/moment/src-tauri/src/platform/mod.rs`
+Run: `grep -n "VisionBackend\|VisionAvailability\|pub trait" /Users/grk/GFiles/Local/moment/src-tauri/src/platform/mod.rs`
 
 If `VisionBackend` is already declared (parent spec §3 hinted it would be), skip Step 2. Otherwise:
 
@@ -1465,7 +1465,7 @@ impl PeakDetector {
 
 - [ ] **Step 3: Run dev build**
 
-Run: `cd /Users/mykhailog/Local/moment && npm run tauri dev > /tmp/m2-boot.log 2>&1 &`
+Run: `cd /Users/grk/GFiles/Local/moment && npm run tauri dev > /tmp/m2-boot.log 2>&1 &`
 
 Wait 90 s (bundle + Vite + cargo first build), then:
 
@@ -1780,7 +1780,7 @@ tracing::info!("sidecar ready: state={:?}", sidecar.state());
 
 - [ ] **Step 3: End-to-end boot**
 
-Run in background: `cd /Users/mykhailog/Local/moment && npm run tauri dev > /tmp/m2-e2e.log 2>&1 &`
+Run in background: `cd /Users/grk/GFiles/Local/moment && npm run tauri dev > /tmp/m2-e2e.log 2>&1 &`
 Wait 90 s.
 Run: `grep -E "Moment starting|sidecar ready|panic|ERROR" /tmp/m2-e2e.log | head -20`
 
@@ -1865,7 +1865,7 @@ In the `## Roadmap` table, flip:
 - [ ] **Step 3: Run full exit-gate locally**
 
 ```bash
-cd /Users/mykhailog/Local/moment
+cd /Users/grk/GFiles/Local/moment
 cd src-tauri && cargo test 2>&1 | tail -5
 cd .. && npm run typecheck 2>&1 | tail -3
 npm run test:run 2>&1 | tail -3

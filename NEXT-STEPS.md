@@ -1,6 +1,6 @@
 # Moment — Next Steps
 
-**Last updated:** 2026-04-24 (after M1 close-out + M2 infrastructure session on 2026-04-23)
+**Last updated:** 2026-07-02 (counts refreshed after overnight fix waves; original M1/M2 snapshot from the 2026-04-23 session)
 
 Point of truth for "what's next after you close this session." Keep ≤ 200 lines.
 
@@ -12,7 +12,7 @@ These block further automated work because only the user can perform them.
 
 ### 1. M1 + M2 live smoke tests
 
-- [ ] Run `npm run tauri dev` from `~/Local/moment/`. Tray icon appears; no panic in log.
+- [ ] Run `npm run tauri dev` from `~/GFiles/Local/moment/`. Tray icon appears; no panic in log.
 - [ ] Follow `docs/user/SMOKE.md` §"Steps" (M1 flow: permission banner, manual capture with ⌘⇧Space, stop with ⌘⇧M, verify `~/Moment/<meeting>/` + `meetings.sqlite`).
 - [ ] Follow `docs/user/SMOKE.md` §"M2 — Peak Detection (additive smoke)" (4-person Zoom, 2.5 min warmup, expect `*_peak-4.png`).
 - [ ] On pass: `git tag -a m1-closed -m "M1 Capture Foundation complete"` and `git tag -a m2-closed -m "M2 Peak Detection complete"`.
@@ -25,10 +25,10 @@ These block further automated work because only the user can perform them.
 
 ### 3. GitHub push decision
 
-29 commits from this session are on local `main` (no push yet). When ready:
+Work now lives on branch `claude/overnight-2026-07-02` — 52 commits ahead of `origin/main` (no push yet; includes the two overnight fix waves below). When ready:
 
 ```bash
-cd ~/Local/moment && git push origin main
+cd ~/GFiles/Local/moment && git push origin main
 ```
 
 Not auto-pushed because push is a shared-state action. Session lives on local-only until user sanctions.
@@ -86,20 +86,29 @@ All have zero impact on M1+M2 functionality. Tackle in a dedicated "hygiene" ses
 
 ---
 
-## Session snapshot
+## Session snapshot — M1/M2 (2026-04-23)
 
-- **Commits on `main` (this session):** 29 (`acbc40d` → `f659cd0`)
+- **Commits on `main` (that session):** 29 (`acbc40d` → `f659cd0`)
 - **Rust tests:** 24 passed (16 M1 + 5 peak + 1 update_peak + 2 supervisor)
 - **Swift tests:** 5 passed + 2 skipped (face fixtures)
 - **Typecheck:** clean
 - **Live boot verified:** `sidecar ready: state=Ready` → `Moment starting` in log
 - **Out of band:** M3 research + M4 research committed as reference docs
 
+## Session snapshot — overnight fix waves (2026-07-02)
+
+- **Branch:** `claude/overnight-2026-07-02` — 52 commits ahead of `origin/main`, not pushed.
+- **Frontend tests:** 32 passed (vitest + RTL) across 5 files — `usePermissions`, `useHotkeys`, `PermissionBanner`, `RecentMeetings`, `tauri` API. (Was vacuously passing before wave 1.)
+- **Rust tests:** 25 test fns (the 24 above + `concurrent_append_screenshot_records_every_entry` in `storage.rs`, wave 1). Not re-run this session — no Rust toolchain installed on this machine; run `cd src-tauri && cargo test` to confirm.
+- **Typecheck:** clean (`npm run typecheck`).
+- **Wave 1:** first real vitest+RTL suite; `storage.rs` `meeting.json` read-modify-write serialized behind a mutex.
+- **Wave 2:** `usePermissions` poll stale-closure fixed (stops polling once granted, + test); CI workflow steps realigned to the current package.json.
+
 ---
 
 ## How to resume
 
-From a fresh session started in `~/Local/moment/`:
+From a fresh session started in `~/GFiles/Local/moment/`:
 
 ```
 Read docs/superpowers/specs/2026-04-17-moment-standalone-design.md

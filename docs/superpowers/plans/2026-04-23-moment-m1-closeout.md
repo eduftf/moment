@@ -51,7 +51,7 @@
 
 ## Pre-flight
 
-Before Task 1, run these **from `~/Local/moment/`** to establish a clean start:
+Before Task 1, run these **from `~/GFiles/Local/moment/`** to establish a clean start:
 
 ```bash
 git status --short       # should show the known drift + untracked index_db.rs
@@ -90,7 +90,7 @@ git commit -m "chore(license): add MIT LICENSE file referenced by README"
 **Why:** Current `CLAUDE.md` still documents the abandoned Zoom-app architecture. Every future Claude Code session in this repo loads this file and gets misled. Fix before any code changes so they land in correct context.
 
 **Files:**
-- Modify: `/Users/mykhailog/Local/moment/CLAUDE.md` (complete replacement)
+- Modify: `/Users/grk/GFiles/Local/moment/CLAUDE.md` (complete replacement)
 
 - [ ] **Step 1: Replace the file contents**
 
@@ -1524,6 +1524,6 @@ The plan author (Claude) verified before handoff:
 
 ## Post-plan notes for the implementation session
 
-- The plan was written from `~/Local/` (HOME mode). The implementation session MUST be run from `~/Local/moment/` so the project brief loads and repo-local hooks fire correctly.
+- The plan was written from `~/GFiles/Local/` (HOME mode). The implementation session MUST be run from `~/GFiles/Local/moment/` so the project brief loads and repo-local hooks fire correctly.
 - `subagent-driven-development` is the recommended sub-skill: each task is independent enough that a fresh subagent per task is clean; the main session reviews between subagent returns.
 - The manual smoke test cannot be executed by Claude. Task 17 Step 5 hands this off to the user explicitly.

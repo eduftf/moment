@@ -10,15 +10,19 @@ export type PermissionState = {
  * Polls granted_permissions at intervalMs while any permission is ungranted.
  * Once all are granted, polling stops. Caller can force a re-check via refresh().
  */
-export function usePermissions(intervalMs: number = 2000): PermissionState & { refresh: () => Promise<void> } {
+export function usePermissions(intervalMs: number = 2000): PermissionState & { refresh: () => Promise<boolean> } {
   const [state, setState] = useState<PermissionState>({ screen: false, loading: true });
 
-  const refresh = async () => {
+  // Returns the freshly-fetched granted flag so callers (and the poll loop)
+  // decide off the live value, never a stale render-time snapshot.
+  const refresh = async (): Promise<boolean> => {
     try {
       const res = await tauri.grantedPermissions();
       setState({ screen: res.screen, loading: false });
+      return res.screen;
     } catch {
       setState((prev) => ({ ...prev, loading: false }));
+      return false;
     }
   };
 
@@ -28,8 +32,10 @@ export function usePermissions(intervalMs: number = 2000): PermissionState & { r
 
     const tick = async () => {
       if (cancelled) return;
-      await refresh();
-      if (!state.screen && !cancelled) {
+      // Use the value we just fetched — not `state.screen`, which is frozen at
+      // the closure created on the first render and would poll forever.
+      const granted = await refresh();
+      if (!granted && !cancelled) {
         timer = window.setTimeout(tick, intervalMs);
       }
     };

@@ -197,7 +197,7 @@ The plan will note per-task test commands and the expected git commit message st
 
 ## 11. Handover checklist to the implementation session
 
-- Session cwd must be `~/Local/moment/` so the project brief loads (HOME-mode brief is inapplicable for in-project edits).
+- Session cwd must be `~/GFiles/Local/moment/` so the project brief loads (HOME-mode brief is inapplicable for in-project edits).
 - This spec + parent spec + M1 plan must all be in context at plan-writing time.
 - The first implementation commit should be either the `index_db` integration or the CLAUDE.md rewrite — both are low-risk unblockers with no UI dependency.
 

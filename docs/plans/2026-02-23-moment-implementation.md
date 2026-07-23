@@ -222,11 +222,11 @@ dist/
 
 **Step 12: Install dependencies**
 
-Run: `cd /Users/mykhailog/Local/moment && npm install`
+Run: `cd /Users/grk/GFiles/Local/moment && npm install`
 
 **Step 13: Verify app builds**
 
-Run: `cd /Users/mykhailog/Local/moment && npm run dev --workspace=app`
+Run: `cd /Users/grk/GFiles/Local/moment && npm run dev --workspace=app`
 Expected: Vite dev server starts on port 3000.
 
 **Step 14: Commit**
@@ -1030,7 +1030,7 @@ h3 {
 
 **Step 3: Verify build compiles**
 
-Run: `cd /Users/mykhailog/Local/moment && npx --workspace=app tsc --noEmit`
+Run: `cd /Users/grk/GFiles/Local/moment && npx --workspace=app tsc --noEmit`
 Expected: No type errors.
 
 **Step 4: Commit**
@@ -1173,12 +1173,12 @@ wss.on("connection", (ws) => {
 
 **Step 2: Build companion**
 
-Run: `cd /Users/mykhailog/Local/moment && npm run build --workspace=companion`
+Run: `cd /Users/grk/GFiles/Local/moment && npm run build --workspace=companion`
 Expected: TypeScript compiles to `companion/dist/index.js`.
 
 **Step 3: Test companion locally**
 
-Run: `node /Users/mykhailog/Local/moment/companion/dist/index.js`
+Run: `node /Users/grk/GFiles/Local/moment/companion/dist/index.js`
 Expected: Prints "Moment Companion listening on ws://localhost:54321".
 Stop with Ctrl+C.
 
@@ -1199,7 +1199,7 @@ git commit -m "feat: add companion CLI with screenshot capture"
 **Step 1: Create GitHub repo under eduftf org**
 
 ```bash
-cd /Users/mykhailog/Local/moment
+cd /Users/grk/GFiles/Local/moment
 gh repo create eduftf/moment --public --source=. --push
 ```
 
@@ -1215,7 +1215,7 @@ This is manual — go to Cloudflare dashboard:
 
 Or via Wrangler CLI:
 ```bash
-cd /Users/mykhailog/Local/moment
+cd /Users/grk/GFiles/Local/moment
 npx wrangler pages project create moment
 npm run build --workspace=app
 npx wrangler pages deploy app/dist --project-name=moment

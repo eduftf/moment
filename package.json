@@ -30,10 +30,17 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "typescript": "^5.6.3",
-    "vite": "^6.0.1",
-    "vitest": "^2.1.5",
+    "vite": "^6.4.3",
+    "vitest": "^3.2.6",
     "@testing-library/react": "^16.0.1",
     "@testing-library/jest-dom": "^6.6.3",
     "jsdom": "^25.0.1"
+  },
+  "overrides": {
+    "form-data": "^4.0.6",
+    "postcss": "^8.5.12",
+    "ws": "^8.21.0",
+    "@babel/core": "^7.29.6",
+    "esbuild": "^0.25.0"
   }
 }
